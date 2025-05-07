@@ -1,0 +1,22 @@
+{
+  "name": "mcp-remote-auth-provider",
+  "version": "0.0.1",
+  "description": "OIDC OAuth provider for remote MCP servers",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "node index.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "desm": "^1.3.1",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-http-proxy": "^2.1.1",
+    "helmet": "^8.1.0",
+    "lodash": "^4.17.21",
+    "morgan": "^1.10.0",
+    "nanoid": "^5.1.5",
+    "oidc-provider": "^9.1.1"
+  },
+  "type": "module"
+}
