@@ -11,6 +11,12 @@ npm install
 
 cp .env-example .env
 echo "OIDC_PROVIDER_JWKS='[$(jwkgen --jwk)]'" >> .env
+```
 
+Inspect `.env` to fill in missing values:
+* `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET` should be set for the upstream/primary Identity OAuth provider (like a Heroku OAuth client, or Salesforce External Client App)
+* redirect URL for the Identity OAuth client should use the path `/interaction/identity/callback`, such as `http://localhost:3001/interaction/identity/callback` for local dev.
+
+```
 npm run server
 ```
