@@ -9,7 +9,8 @@ Based on example https://github.com/panva/node-oidc-provider/blob/main/example/e
 ```
 npm install
 
-echo "OIDC_PROVIDER_JWKS='[$(jwkgen --jwk)]'" > .env
+cp .env-example .env
+echo "OIDC_PROVIDER_JWKS='[$(jwkgen --jwk)]'" >> .env
 
 npm run server
 ```
