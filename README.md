@@ -21,3 +21,12 @@ Inspect `.env` to fill in missing values:
 ```
 npm run server
 ```
+
+Now, run MCP Inspector pointed at the proxy:
+```
+rm -rf ~/.mcp-auth && npx -y @modelcontextprotocol/inspector npx -y mcp-remote@next http://localhost:3001/mcp
+```
+
+And, run the MCP Server itself at `http://localhost:3000`.
+
+When you visit MCP Inspector at `http://localhost:6274` and click Connect, you should be redirected into the Idenity OAuth flow, as configured by the `IDENTITY_*` env variables.
