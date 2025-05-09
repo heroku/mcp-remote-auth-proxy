@@ -5,6 +5,7 @@
 Based on example https://github.com/panva/node-oidc-provider/blob/main/example/express.js
 
 * using https://github.com/rakutentech/jwkgen to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks)
+* Redis aka KeyValueStore is required, set in `REDIS_URL`
 
 ```
 npm install
@@ -14,7 +15,7 @@ echo "OIDC_PROVIDER_JWKS='[$(jwkgen --jwk)]'" >> .env
 ```
 
 Inspect `.env` to fill in missing values:
-* `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET` should be set for the upstream/primary Identity OAuth provider (like a Heroku OAuth client, or Salesforce External Client App)
+* `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET`, `IDENTITY_SCOPE` should be set for the upstream/primary Identity OAuth provider (like a Heroku OAuth client, or Salesforce External Client App) to provide the API access required by the MCP Server's tools.
 * redirect URL for the Identity OAuth client should use the path `/interaction/identity/callback`, such as `http://localhost:3001/interaction/identity/callback` for local dev.
 
 ```
