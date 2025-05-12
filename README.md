@@ -30,3 +30,9 @@ rm -rf ~/.mcp-auth && npx -y @modelcontextprotocol/inspector npx -y mcp-remote@n
 And, run the MCP Server itself at `http://localhost:3000`.
 
 When you visit MCP Inspector at `http://localhost:6274` and click Connect, you should be redirected into the Idenity OAuth flow, as configured by the `IDENTITY_*` env variables.
+
+## Debug
+
+```
+DEBUG=express-http-proxy npm run server
+```
