@@ -1,0 +1,6 @@
+{
+  "issuer": "https://id.herok.com/",
+  "authorization_endpoint": "https://id.herok.com/oauth/authorize",
+  "token_endpoint": "https://id.herok.com/oauth/token",
+  "scopes_supported": "global"
+}
