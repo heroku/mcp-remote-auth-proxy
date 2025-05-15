@@ -19,7 +19,7 @@ Inspect `.env` to fill in missing values:
 * redirect URL for the Identity OAuth client should use the path `/interaction/identity/callback`, such as `http://localhost:3001/interaction/identity/callback` for local dev.
 
 ```
-npm run server
+npm start
 ```
 
 Now, run MCP Inspector pointed at the proxy:
@@ -34,5 +34,5 @@ When you visit MCP Inspector at `http://localhost:6274` and click Connect, you s
 ## Debug
 
 ```
-DEBUG=express-http-proxy npm run server
+DEBUG=express-http-proxy npm start
 ```
