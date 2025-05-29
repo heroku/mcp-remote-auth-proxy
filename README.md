@@ -7,7 +7,7 @@
 This app can be deployed as an MCP Auth Proxy within a Heroku app for a Remote MCP Server.
 
 ```bash
-heroku buildpacks:set --index 1 https://github.com/poetic-labs/git-ssh-key-buildpack.git
+heroku buildpacks:add --index 1 https://github.com/heroku/heroku-buildpack-github-netrc.git
 heroku buildpacks:set --index 2 heroku/nodejs
 heroku buildpacks:set --index 3 https://github.com/heroku/mcp-remote-auth-proxy.git
 ```
@@ -20,12 +20,11 @@ heroku addons:create heroku-redis:private-3 --as=MCP_AUTH_PROXY_REDIS
 
 If a different language than Node.js for the MCP Server, then insert that buildpack before `mcp-remote-auth-proxy`.
 
-[Create a deploy key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys) for the app to access the private mcp-remote-auth-proxy repo. The public key must be added as deploy key in GitHub. The private key must be set in the app's config vars:
+[Create a GitHub auth token](https://github.com/heroku/heroku-buildpack-github-netrc) for the app to access the private mcp-remote-auth-proxy repo:
 
 ```bash
 heroku config:set \
-  GIT_SSH_KEY=$(echo path/to/deploy_key_ed25519 | base64 ) \
-  GIT_SSH_HOST="github.com"
+  GITHUB_AUTH_TOKEN=xxxxx
 ```
 
 Set the base URL for the auth proxy to the public-facing https hostname of the Heroku app. Should be a custom domain name for real deployments:
