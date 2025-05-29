@@ -4,6 +4,14 @@
 BUILD_DIR="$1"
 INSTALL_DIR="$BUILD_DIR/mcp-auth-proxy"
 
+if which node
+then
+  echo "MCP Auth Proxy found node $(node -v)" >&2
+else
+  echo "MCP Auth Proxy requires 'node' must be available in PATH" >&2
+  exit 1
+fi
+
 mkdir -p "$INSTALL_DIR"
 cp -r lib *.js *.json "$INSTALL_DIR"
 

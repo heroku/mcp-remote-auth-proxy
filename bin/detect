@@ -1,13 +1,5 @@
 #!/bin/sh
 # Usage: bin/detect <build-dir>
 
-if which node
-then
-  echo "MCP Auth Proxy found node $(node -v)" >&2
-else
-  echo "MCP Auth Proxy requires 'node' must be available in PATH" >&2
-  exit 1
-fi
-
 echo "MCP Auth Proxy"
 exit 0
