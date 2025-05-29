@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cat << EOF
+---
+default_process_types:
+  web: node mcp-auth-proxy/index.js
+EOF

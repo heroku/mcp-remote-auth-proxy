@@ -1,0 +1,11 @@
+#!/bin/sh
+# Usage: bin/compile <build-dir> <cache-dir> <env-dir>
+
+BUILD_DIR="$1"
+INSTALL_DIR="$BUILD_DIR/mcp-auth-proxy"
+
+mkdir -p "$INSTALL_DIR"
+cp -r lib *.js *.json "$INSTALL_DIR"
+
+cd "$INSTALL_DIR"
+npm install --omit dev
