@@ -54,8 +54,11 @@ Set the internal, local URL for the proxy to reach the MCP Server, and the comma
 
 ```bash
 heroku config:set \
-  MCP_SERVER_URL=http://localhost:3000/mcp \
-  MCP_SERVER_RUN_COMMAND="cd /app && PORT=3000 npm start"
+  MCP_SERVER_URL=http://localhost:3000/mcp \  
+  MCP_SERVER_RUN_COMMAND="npm" \
+  MCP_SERVER_RUN_ARGS_JSON='["start"]' \
+  MCP_SERVER_RUN_DIR="/Users/mars.hall/Projects/mcp-heroku-com" \
+  MCP_SERVER_RUN_ENV_JSON='{"PORT":3000,"HEROKU_API_URL":"https://api.staging.herokudev.com"}'
 ```
 
 ## Auth Proxy Provider Cryptography
