@@ -1,10 +1,18 @@
 # OAuth proxy for remote Model Context Protocol servers
 
-⚠️ **This is a work in progress, not yet functional.** This contains hardcoded localhost:port references, and expects the MCP server to host its resource endpoints at `/mcp`.
+Heroku RFC: [Authorization Proxy for Remote MCP Servers](https://salesforce.quip.com/TtBWAC0Ub9eJ).
+
+This app is intended be deployed as an MCP Auth Proxy within a Heroku app for a Remote MCP Server, although it can be run as a separate free-standing proxy app.
+
+Originally based on [node-oidc-provider Express.js example](https://github.com/panva/node-oidc-provider/blob/main/example/express.js).
 
 # Deployment
 
-This app can be deployed as an MCP Auth Proxy within a Heroku app for a Remote MCP Server.
+With a new Heroku app, created in a Private Space, for an MCP Server repo like [mcp-heroku-com](https://github.com/heroku/mcp-heroku-com)…
+
+## Buildpacks
+
+Add the required buildpacks for this auth proxy. Ensure that `mcp-remote-auth-proxy` is always last, so that its [default web process](bin/release) is launched.
 
 ```bash
 heroku buildpacks:add --index 1 https://github.com/heroku/heroku-buildpack-github-netrc.git
@@ -12,13 +20,9 @@ heroku buildpacks:set --index 2 heroku/nodejs
 heroku buildpacks:set --index 3 https://github.com/heroku/mcp-remote-auth-proxy.git
 ```
 
-Key-Value store is required for clients & authorizations storage.
-
-```bash
-heroku addons:create heroku-redis:private-3 --as=MCP_AUTH_PROXY_REDIS
-```
-
 If a different language than Node.js for the MCP Server, then insert that buildpack before `mcp-remote-auth-proxy`.
+
+### GitHub User Token for `mcp-remote-auth-proxy` buildpack
 
 [Create a GitHub auth token](https://github.com/heroku/heroku-buildpack-github-netrc) for the app to access the private mcp-remote-auth-proxy repo:
 
@@ -27,14 +31,26 @@ heroku config:set \
   GITHUB_AUTH_TOKEN=xxxxx
 ```
 
-Set the base URL for the auth proxy to the public-facing https hostname of the Heroku app. Should be a custom domain name for real deployments:
+## Key-Value Store
+
+Key-Value store is required for clients & authorizations storage.
+
+```bash
+heroku addons:create heroku-redis:private-3 --as=MCP_AUTH_PROXY_REDIS
+```
+
+## Auth Proxy Base URL
+
+Set the base URL for the auth proxy to the public-facing https hostname of the Heroku app. Should be a custom domain name for real deployments. This is self-referential in auth flow redirect URIs:
 
 ```bash
 heroku config:set \
   BASE_URL=https://mcp-heroku-com-with-auth-proxy-5f63807b3fb0.herokuapp.com
 ```
 
-Set the internal, local URL for the proxy to reach the MCP Server, and the command to start it, overriding whatever the `PORT` is already set to be Heroku. For example:
+## MCP Server URL & Command
+
+Set the internal, local URL for the proxy to reach the MCP Server, and the command to start it, overriding whatever the `PORT` is already set to be by Heroku runtime. For example:
 
 ```bash
 heroku config:set \
@@ -42,18 +58,28 @@ heroku config:set \
   MCP_SERVER_RUN_COMMAND="cd /app && PORT=3000 npm start"
 ```
 
-Generate the cryptographic material for the auth proxy:
+## Auth Proxy Provider Cryptography
+
+Generate the cryptographic material for the auth proxy. Uses https://github.com/rakutentech/jwkgen to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks):
 
 ```bash
 heroku config:set \
   OIDC_PROVIDER_JWKS="[$(jwkgen --jwk)]"
 ```
 
-Generate a new OAuth client for the Identity provider, for example, Heroku Identity:
+## Identity Provider OAuth Client
+
+Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) `BASE_URL` origin. 
+
+For example, Heroku Identity:
 
 ```bash
 heroku clients:create mcp-heroku-com-with-auth-proxy 'https://mcp-heroku-com-with-auth-proxy-5f63807b3fb0.herokuapp.com/interaction/identity/callback'
 ```
+
+*Each identity provider has its own process/interface to create OAuth clients. Please see their documentation for instructions.*
+
+Once created, set the client ID & secret in the config vars, along with the Identity Provider's URL & OAuth scope to be granted.
 
 ```bash
 heroku config:set \
@@ -62,6 +88,8 @@ heroku config:set \
   IDENTITY_CLIENT_SECRET=zzzzz \
   IDENTITY_SCOPE=global
 ```
+
+### Non-OIDC Providers
 
 Optionally, for Identity providers that do not support OIDC discovery, 
 reference a [ServerMetadata JSON file](https://github.com/panva/openid-client/blob/v6.x/docs/interfaces/ServerMetadata.md), containing: `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, & `"scopes_supported"`.
@@ -73,12 +101,14 @@ heroku config:set \
   IDENTITY_SERVER_METADATA_FILE='/app/mcp-auth-proxy/heroku_identity_staging_metadata.json'
 ```
 
+## Build & Launch 🚀
+
+Now the Heroku app should be ready to build & launch. In the Heroku Dashboard, start a new deployment for the app.
+
 # Local Dev
 
-Based on example https://github.com/panva/node-oidc-provider/blob/main/example/express.js
-
 * using https://github.com/rakutentech/jwkgen to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks)
-* Redis aka KeyValueStore is required, set in `REDIS_URL`
+* Redis aka KeyValueStore is required, set in `MCP_AUTH_PROXY_REDIS_URL`
 
 ```
 npm install
