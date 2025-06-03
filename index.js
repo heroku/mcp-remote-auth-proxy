@@ -1,3 +1,5 @@
 import 'dotenv/config';
 
-import './lib/server.js';
+import server from './lib/server.js';
+
+server(process.env);
