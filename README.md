@@ -137,6 +137,14 @@ And, run the MCP Server itself at `http://localhost:3000`.
 
 When you visit MCP Inspector at `http://localhost:6274` and click Connect, you should be redirected into the Idenity OAuth flow, as configured by the `IDENTITY_*` env variables.
 
+## Testing
+
+```
+npm test
+```
+
+This script runs `mocha` with the environment loaded from `.env-test`.
+
 ## Debug
 
 ```
