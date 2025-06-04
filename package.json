@@ -2,6 +2,9 @@
   "name": "mcp-remote-auth-provider",
   "version": "0.0.1",
   "description": "OIDC OAuth provider for remote MCP servers",
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "scripts": {
     "test": "LOCAL_INSECURE=true PORT=3001 MCP_AUTH_PROXY_REDIS_URL=redis://localhost:6379 mocha",
     "start": "node index.js"
