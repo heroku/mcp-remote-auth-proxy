@@ -38,6 +38,43 @@ describe('server', function () {
       assert(mcpServerProc.pid > 0);
     });
 
+    describe('GET /.well-known/oauth-authorization-server', function () {
+      it('should respond with JSON metadata', function (done) {
+        const options = {
+          protocol: authProxyUrl.protocol,
+          hostname: authProxyUrl.hostname,
+          port: authProxyUrl.port,
+          path: '/.well-known/oauth-authorization-server',
+          method: 'GET'
+        };
+        const req = http.request(
+          options,
+          (res) => {
+            assert.equal(res.statusCode, 200);
+            let resBody = '';
+
+            res.on("data", (chunk) => {
+              resBody = resBody + chunk;
+            });
+        
+            res.on("end", () => {
+              try {
+                let parsedBody = JSON.parse(resBody);
+                assert.equal(parsedBody.issuer, env.BASE_URL);
+                done()
+              } catch (err) {
+                done(err);
+              }
+            });
+          }
+        );
+        req.on('error', (e) => {
+          done(e);
+        });
+        req.end();
+      });
+    });
+
     describe('POST /mcp', function () {
       it('should respond 401', function (done) {
         const postData = JSON.stringify({
