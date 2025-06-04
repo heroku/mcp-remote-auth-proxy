@@ -7,6 +7,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Node Tests
 
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
     strategy:
       matrix:
         node-version: [22.x]
