@@ -6,7 +6,7 @@
     "node": ">=22.16.0"
   },
   "scripts": {
-    "test": "LOCAL_INSECURE=true PORT=3001 MCP_AUTH_PROXY_REDIS_URL=redis://localhost:6379 mocha",
+    "test": "DOTENV_CONFIG_PATH=.env-test mocha -r dotenv/config",
     "start": "node index.js"
   },
   "license": "ISC",
