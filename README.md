@@ -108,7 +108,7 @@ heroku config:set \
 
 Now the Heroku app should be ready to build & launch. In the Heroku Dashboard, start a new deployment for the app.
 
-# Local Dev
+# Development
 
 * using https://github.com/rakutentech/jwkgen to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks)
 * Redis aka KeyValueStore is required, set in `MCP_AUTH_PROXY_REDIS_URL`
@@ -136,6 +136,17 @@ rm -rf ~/.mcp-auth && npx -y @modelcontextprotocol/inspector npx -y mcp-remote@n
 And, run the MCP Server itself at `http://localhost:3000`.
 
 When you visit MCP Inspector at `http://localhost:6274` and click Connect, you should be redirected into the Idenity OAuth flow, as configured by the `IDENTITY_*` env variables.
+
+## Patching Third-party Packages
+
+In order to support the quirks of the emerging MCP Clients, some third-party packages must be patched.
+
+We use [patch-package](https://www.npmjs.com/package/patch-package) to perform this trick.
+
+Patching is configured with:
+1. [`package.json`](package.json) `postinstall` script
+2. code diffs in [`patches/`](patches/)
+3. create or update a patch `npm exec patch-package MODULE_NAME` 
 
 ## Testing
 

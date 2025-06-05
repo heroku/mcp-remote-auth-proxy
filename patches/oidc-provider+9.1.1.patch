@@ -1,0 +1,15 @@
+diff --git a/node_modules/oidc-provider/lib/helpers/client_schema.js b/node_modules/oidc-provider/lib/helpers/client_schema.js
+index 0fe420f..ec105f7 100644
+--- a/node_modules/oidc-provider/lib/helpers/client_schema.js
++++ b/node_modules/oidc-provider/lib/helpers/client_schema.js
+@@ -618,8 +618,8 @@ export default function getSchema(provider) {
+                   this.invalidate(`${label} for native clients using claimed HTTPS URIs must not be using ${hostname} as hostname`);
+                 }
+                 break;
+-              default: // Private-use URI Scheme Redirection
+-                if (!protocol.includes('.')) {
++              default: // Private-use URI Scheme Redirection, patched for Cursor 1.0
++                if (!protocol.includes('.') && protocol !== 'cursor:') {
+                   this.invalidate(`${label} for native clients using Custom URI scheme should use reverse domain name based scheme`);
+                 }
+             }

@@ -6,6 +6,7 @@
     "node": ">=22.16.0"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "test": "DOTENV_CONFIG_PATH=.env-test mocha -r dotenv/config",
     "start": "node index.js"
   },
@@ -21,7 +22,8 @@
     "morgan": "^1.10.0",
     "nanoid": "^5.1.5",
     "oidc-provider": "^9.1.1",
-    "openid-client": "^6.5.0"
+    "openid-client": "^6.5.0",
+    "patch-package": "^8.0.0"
   },
   "type": "module",
   "devDependencies": {
