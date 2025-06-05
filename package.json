@@ -2,8 +2,11 @@
   "name": "mcp-remote-auth-provider",
   "version": "0.0.1",
   "description": "OIDC OAuth provider for remote MCP servers",
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "DOTENV_CONFIG_PATH=.env-test mocha -r dotenv/config",
     "start": "node index.js"
   },
   "license": "ISC",
@@ -20,5 +23,8 @@
     "oidc-provider": "^9.1.1",
     "openid-client": "^6.5.0"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "mocha": "^11.5.0"
+  }
 }
