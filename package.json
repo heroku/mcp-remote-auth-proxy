@@ -6,7 +6,7 @@
     "node": ">=22.16.0"
   },
   "scripts": {
-    "postinstall": "pwd && patch-package",
+    "postinstall": "pwd && ls -hal && patch-package",
     "test": "DOTENV_CONFIG_PATH=.env-test mocha -r dotenv/config",
     "start": "node index.js"
   },
