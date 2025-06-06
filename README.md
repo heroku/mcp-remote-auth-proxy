@@ -48,6 +48,21 @@ heroku config:set \
   BASE_URL=https://mcp-heroku-com-with-auth-proxy-5f63807b3fb0.herokuapp.com
 ```
 
+## Auth Proxy Views Directory
+
+The Auth Proxy leverages EJS for templating of interaction views. As of this writing, the only templates required are `confirm-login.ejs` and `_layout.ejs`.
+
+See the default, built-in templates for Heroku: [lib/views/](lib/views).
+
+The directory path must be an absolute path, starting with `/`.
+
+For example, to use a directory such as `/support/auth-views` committed along with the MCP Server source code, running on Heroku:
+
+```
+heroku config:set \
+  OIDC_PROVIDER_VIEWS_PATH=/app/support/auth-views
+```
+
 ## MCP Server URL & Command
 
 Set the internal, local URL for the proxy to reach the MCP Server, and the command to start it, overriding whatever the `PORT` is already set to be by Heroku runtime. For example:
