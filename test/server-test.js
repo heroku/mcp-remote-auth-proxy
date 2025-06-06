@@ -4,7 +4,7 @@ import assert from 'assert';
 
 import server from '../lib/server.js';
 
-describe('server', function () {
+describe('Server', function () {
   describe('without environment', function () {
     it('should crash', function () {
       assert.throws(() => server(), {
@@ -17,24 +17,30 @@ describe('server', function () {
     const env = process.env;
     const authProxyUrl = new URL(env.BASE_URL);
 
-    let authProxyApp;
+    let authProxyServer;
     let mcpServerProc;
     
+    // Run the server once for all tests, otherwise 
+    // the sub-processes end up as ghosts that pollute 
+    // the system's process tree, preventing further 
+    // correct runs or tests.
     before(function(done) {
       server(env, (a, b) => {
-        authProxyApp = a;
+        authProxyServer = a;
         mcpServerProc = b;
         done();
       });
     });
 
-    after(function() {
-      authProxyApp.closeAllConnections();
+    after(function(done) {
       mcpServerProc.kill();
+      authProxyServer.close((err) => {
+        err ? done(err) : done();
+      });
     });
 
     it('should start successfully', function () {
-      assert(authProxyApp.listening);
+      assert(authProxyServer.listening);
       assert(mcpServerProc.pid > 0);
     });
 
@@ -75,8 +81,8 @@ describe('server', function () {
       });
     });
 
-    describe('POST /mcp', function () {
-      it('should respond 401', function (done) {
+    describe('POST /mcp without authorization', function () {
+      it('should be rejected by Auth Proxy', function (done) {
         const postData = JSON.stringify({
           'msg': 'Hello World!',
         });

@@ -5,7 +5,9 @@ const port = process.env.PORT || 8080;
 
 app.post('/mcp', (req, res) => {
   console.log('POST /mcp')
-  res.send('Hello World!')
+  res.json({
+    'msg': 'Back at ya!',
+  })
 })
 
 app.listen(port, () => {
