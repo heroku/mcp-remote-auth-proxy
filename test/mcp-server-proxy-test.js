@@ -119,7 +119,7 @@ describe('Auth Proxy for MCP Server', function () {
   describe('POST /mcp with valid access token', function () {
     it('should respond 200', function (done) {
       const postData = JSON.stringify({
-        'msg': 'Hello World!',
+        'test-mode': 'check-for-identity-token',
       });
       const options = {
         protocol: authProxyUrl.protocol,
@@ -130,7 +130,7 @@ describe('Auth Proxy for MCP Server', function () {
         headers: {
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(postData),
-          'Authorization': `Bearer ${validAccessToken}`
+          'Authorization': `bearer ${validAccessToken}`
         }
       };
       const req = http.request(
@@ -146,7 +146,7 @@ describe('Auth Proxy for MCP Server', function () {
           res.on("end", () => {
             try {
               let parsedBody = JSON.parse(resBody);
-              assert.equal(parsedBody.msg, 'Back at ya!');
+              assert.equal(parsedBody.msg, 'Received correct test identity token.');
               done()
             } catch (err) {
               done(err);
