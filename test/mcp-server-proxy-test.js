@@ -1,14 +1,16 @@
+import sinon from 'sinon';
 import assert from 'assert';
 import { Buffer } from 'node:buffer';
 import http from 'node:http';
 
-import { Provider } from 'oidc-provider';
-import providerConfig from '../lib/provider-config.js';
-
 import express from 'express';
 
+import { Provider } from 'oidc-provider';
+import providerConfig from '../lib/provider-config.js';
+import { identityClient, identityClientInit } from '../lib/identity-client.js';
 import runMcpServerAndThen from '../lib/run-mcp-server-and-then.js';
 import useMcpServerProxy from '../lib/use-mcp-server-proxy.js';
+import { useSessionReset, getSessionResetUrl } from "../lib/use-session-reset.js";
 
 import {
   clientData,
@@ -26,6 +28,7 @@ describe('Auth Proxy for MCP Server', function () {
   const authProxyUrl = new URL(env.BASE_URL);
   const mcpServerUrl = new URL(env.MCP_SERVER_URL);
 
+  let sinonSandbox;
   let parentExpressApp;
   let parentServer;
   let mcpServerProcess;
@@ -33,7 +36,9 @@ describe('Auth Proxy for MCP Server', function () {
 
   let validAccessToken;
 
-  before(async function() {
+  beforeEach(async function() {
+    sinonSandbox = sinon.createSandbox();
+
     let {
       adapter: _,  // do not use the Redis adapter here
       ...testProviderConfig
@@ -54,10 +59,13 @@ describe('Auth Proxy for MCP Server', function () {
     );
     validAccessToken = accessTokenData.jti;
 
+    identityClientInit(env);
+
     parentExpressApp = express();
     parentExpressApp.use(express.json());
 
     useMcpServerProxy(parentExpressApp, oidcProvider, mcpServerUrl);
+    useSessionReset(parentExpressApp, authProxyUrl);
 
     await new Promise((resolve, reject) => {
       runMcpServerAndThen(
@@ -78,7 +86,8 @@ describe('Auth Proxy for MCP Server', function () {
     });
   });
 
-  after(function(done) {
+  afterEach(function(done) {
+    sinonSandbox.restore();
     mcpServerProcess.kill();
     parentServer.close((err) => {
       err ? done(err) : done();
@@ -116,7 +125,7 @@ describe('Auth Proxy for MCP Server', function () {
     });
   });
 
-  describe('POST /mcp with valid access token', function () {
+  describe('POST /mcp with valid authorization', function () {
     it('should respond 200', function (done) {
       const postData = JSON.stringify({
         'test-mode': 'check-for-identity-token',
@@ -146,7 +155,61 @@ describe('Auth Proxy for MCP Server', function () {
           res.on("end", () => {
             try {
               let parsedBody = JSON.parse(resBody);
-              assert.equal(parsedBody.msg, 'Received correct test identity token.');
+              assert.equal(parsedBody.msg, 'Received correct test authorization.');
+              done()
+            } catch (err) {
+              done(err);
+            }
+          });
+        }
+      );
+      req.on('error', (e) => {
+        done(e);
+      });
+      req.write(postData);
+      req.end();
+    });
+  });
+
+  describe('POST /mcp with invalid authorization', function () {
+    it('should perform identity token refresh and automatically retry the request', function (done) {
+      sinonSandbox.stub(identityClient, "refreshTokenGrant").returns({
+        access_token: 'refreshed_test_identity_access_token',
+        signature: 'x',
+        scope: 'global',
+        token_type: 'bearer',
+        issued_at: new Date().getTime()
+      });
+
+      const postData = JSON.stringify({
+        'test-mode': 'respond-unauthorized',
+      });
+      const options = {
+        protocol: authProxyUrl.protocol,
+        hostname: authProxyUrl.hostname,
+        port: authProxyUrl.port,
+        path: '/mcp',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(postData),
+          'Authorization': `bearer ${validAccessToken}`
+        }
+      };
+      const req = http.request(
+        options,
+        (res) => {
+          assert.equal(res.statusCode, 200);
+          let resBody = '';
+
+          res.on("data", (chunk) => {
+            resBody = resBody + chunk;
+          });
+      
+          res.on("end", () => {
+            try {
+              let parsedBody = JSON.parse(resBody);
+              assert.equal(parsedBody.msg, 'Received refreshed test authorization');
               done()
             } catch (err) {
               done(err);
@@ -162,4 +225,36 @@ describe('Auth Proxy for MCP Server', function () {
     });
   });
   
+  it('should reset client auth when token refresh fails', function (done) {
+    sinonSandbox.stub(identityClient, "refreshTokenGrant").throws(new Error('Test token refresh failure'));
+
+    const postData = JSON.stringify({
+      'test-mode': 'respond-unauthorized',
+    });
+    const options = {
+      protocol: authProxyUrl.protocol,
+      hostname: authProxyUrl.hostname,
+      port: authProxyUrl.port,
+      path: '/mcp',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData),
+        'Authorization': `bearer ${validAccessToken}`
+      }
+    };
+    const req = http.request(
+      options,
+      (res) => {
+        assert.equal(res.statusCode, 302);
+        assert.equal(res.headers['location'], getSessionResetUrl());
+        done();
+      }
+    );
+    req.on('error', (e) => {
+      done(e);
+    });
+    req.write(postData);
+    req.end();
+  });
 });
