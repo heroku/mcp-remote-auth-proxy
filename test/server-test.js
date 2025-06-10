@@ -3,6 +3,7 @@ import { Buffer } from 'node:buffer';
 import assert from 'assert';
 
 import server from '../lib/server.js';
+import RedisAdapter from "../lib/redis-adapter.js";
 
 describe('Server', function () {
   describe('without environment', function () {
@@ -25,14 +26,19 @@ describe('Server', function () {
     // the system's process tree, preventing further 
     // correct runs or tests.
     before(function(done) {
-      server(env, (a, b) => {
-        authProxyServer = a;
-        mcpServerProc = b;
-        done();
-      });
+      try {
+        server(env, (a, b) => {
+          authProxyServer = a;
+          mcpServerProc = b;
+          done();
+        });
+      } catch (err) {
+        done(err);
+      }
     });
 
     after(function(done) {
+      RedisAdapter.disconnect();
       mcpServerProc.kill();
       authProxyServer.close((err) => {
         err ? done(err) : done();
