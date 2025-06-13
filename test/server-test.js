@@ -31,6 +31,10 @@ describe('Server', function () {
           authProxyServer = a;
           mcpServerProc = b;
           done();
+        }, (code) => {
+          if (code !== 0) {
+            assert(false, `Server exited code=${code} before tests completed. Check for errors logged above.`);
+          }
         });
       } catch (err) {
         done(err);
@@ -39,15 +43,24 @@ describe('Server', function () {
 
     after(function(done) {
       RedisAdapter.disconnect();
-      mcpServerProc.kill();
-      authProxyServer.close((err) => {
-        err ? done(err) : done();
-      });
+      mcpServerProc?.kill();
+      if (authProxyServer) {
+        authProxyServer.close((err) => {
+          err ? done(err) : done();
+        });
+      } else {
+        done()
+      }
     });
 
     it('should start successfully', function () {
       assert(authProxyServer.listening);
       assert(mcpServerProc.pid > 0);
+    });
+
+    it('should be connected to Redis', async function () {
+      const redisInfo = await RedisAdapter.client.info();
+      assert(redisInfo);
     });
 
     describe('GET /.well-known/oauth-authorization-server', function () {
