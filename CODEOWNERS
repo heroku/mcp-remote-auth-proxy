@@ -1,0 +1,8 @@
+# All files require review from Heroku Front-End Dev Tools, FE Infra & Arch or AI teams.
+
+# Comment line immediately above ownership line is reserved for related GUS information.
+
+# Please exercise caution while editing.
+
+#GUSINFO: Heroku FE Dev Tools,Heroku CLI & Plugins
+@heroku/frontend-dev-tooling @heroku/front-end-infra @heroku/ai
