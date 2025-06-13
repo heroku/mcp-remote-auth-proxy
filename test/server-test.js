@@ -21,11 +21,7 @@ describe('Server', function () {
     let authProxyServer;
     let mcpServerProc;
     
-    // Run the server once for all tests, otherwise 
-    // the sub-processes end up as ghosts that pollute 
-    // the system's process tree, preventing further 
-    // correct runs or tests.
-    before(function(done) {
+    beforeEach(function(done) {
       try {
         server(env, (a, b) => {
           authProxyServer = a;
@@ -41,13 +37,17 @@ describe('Server', function () {
       }
     });
 
-    after(function(done) {
+    afterEach(function(done) {
       RedisAdapter.disconnect();
-      mcpServerProc?.kill();
+      if (mcpServerProc) {
+        mcpServerProc.kill();
+        mcpServerProc = null;
+      }
       if (authProxyServer) {
         authProxyServer.close((err) => {
           err ? done(err) : done();
         });
+        authProxyServer= null;
       } else {
         done()
       }
