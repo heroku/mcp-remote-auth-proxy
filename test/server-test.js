@@ -3,6 +3,7 @@ import { Buffer } from 'node:buffer';
 import assert from 'assert';
 
 import server from '../lib/server.js';
+import RedisAdapter from "../lib/redis-adapter.js";
 
 describe('Server', function () {
   describe('without environment', function () {
@@ -20,28 +21,46 @@ describe('Server', function () {
     let authProxyServer;
     let mcpServerProc;
     
-    // Run the server once for all tests, otherwise 
-    // the sub-processes end up as ghosts that pollute 
-    // the system's process tree, preventing further 
-    // correct runs or tests.
-    before(function(done) {
-      server(env, (a, b) => {
-        authProxyServer = a;
-        mcpServerProc = b;
-        done();
-      });
+    beforeEach(function(done) {
+      try {
+        server(env, (a, b) => {
+          authProxyServer = a;
+          mcpServerProc = b;
+          done();
+        }, (code) => {
+          if (code !== 0) {
+            assert(false, `Server exited code=${code} before tests completed. Check for errors logged above.`);
+          }
+        });
+      } catch (err) {
+        done(err);
+      }
     });
 
-    after(function(done) {
-      mcpServerProc.kill();
-      authProxyServer.close((err) => {
-        err ? done(err) : done();
-      });
+    afterEach(function(done) {
+      RedisAdapter.disconnect();
+      if (mcpServerProc) {
+        mcpServerProc.kill();
+        mcpServerProc = null;
+      }
+      if (authProxyServer) {
+        authProxyServer.close((err) => {
+          err ? done(err) : done();
+        });
+        authProxyServer= null;
+      } else {
+        done()
+      }
     });
 
     it('should start successfully', function () {
       assert(authProxyServer.listening);
       assert(mcpServerProc.pid > 0);
+    });
+
+    it('should be connected to Redis', async function () {
+      const redisInfo = await RedisAdapter.client.info();
+      assert(redisInfo);
     });
 
     describe('GET /.well-known/oauth-authorization-server', function () {
