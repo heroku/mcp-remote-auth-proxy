@@ -176,3 +176,43 @@ This script runs `mocha` with the environment loaded from `.env-test`.
 ```
 DEBUG=express-http-proxy npm start
 ```
+# Rolling Credentials
+
+### Platform OAuth Client
+
+Both production and canary use a [Trusted Platform Client](https://github.com/heroku/api/blob/master/docs/daily-operations/platform_clients.md)
+
+#### Production
+
+1. There is no zero downtime way to do the credroll. Notify #heroku-support and #heroku-ecosystem that you will be performing maintenance on Heroku MCP for a few minutes when rolling credentials for the production app. Try to do it in a low usage time window, preferrably between 00:00-01:00 UTC (21:00-22:00 ART / 17:00-18:00 PT).
+
+2. Get the Trusted Platform Client UUID
+  ```sh
+  heroku config:get IDENTITY_CLIENT_ID -a mcp-heroku-com
+  ```
+3. Put the application in maintenance mode.
+  ```sh
+  heroku maintenance:on -a mcp-heroku-com
+  ```
+4. Rotate the client's credentials
+  ```sh
+  heroku sudo -u api+oauth@heroku.com -- clients:rotate <IDENTITY_CLIENT_ID>
+  ```
+5. If the last command seems to fail (503) with a timeout message, it won't output the new credentials. Instead, you will need to download a JSON
+containing all clients, search Elements' client with the UUID and copy the associated secret token.
+  ```sh
+  heroku sudo -u api+oauth@heroku.com -- clients --json > all_client_secrets.json
+  ```
+6. Edit the `HEROKU_OAUTH_SECRET` config var value
+  ```sh
+  heroku config:edit IDENTITY_CLIENT_SECRET -a mcp-heroku-com
+  ```
+7. Paste the new secret token, save and quit.
+8. Wait for all dynos to cycle
+  ```sh
+  heroku ps:wait -a mcp-heroku-com
+  ```
+9. Take the application out of maintenance mode.
+  ```sh
+  heroku maintenance:off -a mcp-heroku-com
+  ```
