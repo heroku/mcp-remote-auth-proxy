@@ -119,6 +119,39 @@ heroku config:set \
   IDENTITY_SERVER_METADATA_FILE='/app/mcp-auth-proxy/heroku_identity_staging_metadata.json'
 ```
 
+## OpenTelemetry
+
+The Auth Proxy supports sending OpenTelemetry traces to an observability platform for storage and monitoring, using standard OpenTelemetry environment variables for configuration.
+
+For environments that don't require telemetry data to be sent, set the following config var on the Heroku app:
+
+```bash
+heroku config:set \
+  OTEL_SDK_DISABLED='true'
+```
+
+If the `OTEL_SDK_DISABLED` config var is omitted or set to a value different from `true`, the Auth Proxy will attempt to enable OpenTelemetry tracing provided the required config vars `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_PROTOCOL` have been correctly set according to the observability platform where traces are to be sent. Additionally, some platforms require specific headers with API or License Keys to be set in `OTEL_EXPORTER_OTLP_HEADERS` in order for the telemetry information to reach the endpoint.
+
+For Honeycomb, the following config vars should be set:
+
+```bash
+heroku config:set \
+  OTEL_EXPORTER_OTLP_ENDPOINT='https://api.honeycomb.io' \
+  OTEL_EXPORTER_OTLP_HEADERS='x-honeycomb-team=<HONEYCOMB_ENVIRONMENT_API_KEY>' \
+  OTEL_EXPORTER_OTLP_PROTOCOL='http/protobuf' \
+```
+
+In the previous command, replace `<HONEYCOMB_ENVIRONMENT_API_KEY>` with a valid ingestion API Key specific for the Honeycomb Environment matching the app environment (development, staging or production).
+
+Finally, the `OTEL_SERVICE_NAME` needs to be set to the logical name of the service. According to [OpenTelemetry's documentation](https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-attributes) it MUST be the same for all instances of horizontally scaled services. For Heroku apps, the preferred value is the app name:
+
+```bash
+heroku config:set \
+  OTEL_SERVICE_NAME=<app-name>
+```
+
+If `OTEL_SERVICE_NAME` isn't set, the `service.name` attribute will be set to `unknown_service` following OpenTelemetry requirements.
+
 ## Build & Launch 🚀
 
 Now the Heroku app should be ready to build & launch. In the Heroku Dashboard, start a new deployment for the app.
@@ -131,13 +164,13 @@ Now the Heroku app should be ready to build & launch. In the Heroku Dashboard, s
 ```
 npm install
 
-cp .env-example .env
-echo "OIDC_PROVIDER_JWKS='[$(jwkgen --jwk)]'" >> .env
+cp .env.template .env
 ```
 
 Inspect `.env` to fill in missing values:
 * `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET`, `IDENTITY_SCOPE` should be set for the upstream/primary Identity OAuth provider (like a Heroku OAuth client, or Salesforce External Client App) to provide the API access required by the MCP Server's tools.
 * redirect URL for the Identity OAuth client should use the path `/interaction/identity/callback`, such as `http://localhost:3001/interaction/identity/callback` for local dev.
+* `OTEL_SDK_DISABLED` must be set to `false` and both `OTEL_SERVICE_NAME` and `HONEYCOMB_DEVELOPMENT_API_KEY` must be set according to instructions on the `.env.template` file if you want OTel traces to be sent to Honeycomb.
 
 ```
 npm start
