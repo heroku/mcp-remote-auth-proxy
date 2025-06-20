@@ -199,7 +199,7 @@ Both production and canary use a [Trusted Platform Client](https://github.com/he
   heroku sudo -u api+oauth@heroku.com -- clients:rotate <IDENTITY_CLIENT_ID>
   ```
 5. If the last command seems to fail (503) with a timeout message, it won't output the new credentials. Instead, you will need to download a JSON
-containing all clients, search Elements' client with the UUID and copy the associated secret token.
+containing all clients, search MCP OAuth Clients with the UUID and copy the associated secret token.
   ```sh
   heroku sudo -u api+oauth@heroku.com -- clients --json > all_client_secrets.json
   ```
