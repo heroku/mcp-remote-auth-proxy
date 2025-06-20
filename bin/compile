@@ -17,7 +17,7 @@ set -e
 mkdir -p "$INSTALL_DIR"
 
 # Only add the required files & directories to the slug
-cp -r lib patches *.js *.json "$INSTALL_DIR"
+cp -r lib patches *.mjs *.js *.json "$INSTALL_DIR"
 
 cd "$INSTALL_DIR"
 npm install --omit dev
