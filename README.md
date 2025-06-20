@@ -150,7 +150,7 @@ heroku config:set \
   OTEL_SERVICE_NAME=<app-name>
 ```
 
-If `OTEL_SERVICE_NAME` isn't set, the `service.name` attribute will be set to `unknown_service` following OpenTelemetry requirements.
+If `OTEL_SERVICE_NAME` isn't set, the `service.name` attribute will be set to `unnamed_mcp_remote_auth_proxy` following OpenTelemetry requirements.
 
 ## Build & Launch 🚀
 
