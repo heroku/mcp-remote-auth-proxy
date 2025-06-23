@@ -1,11 +1,15 @@
 import express from 'express';
+import { createRequestLogger, default as logger } from '../../lib/logger.js';
 
 const app = express();
 app.use(express.json());
 const port = process.env.PORT || 8080;
 
 app.post('/mcp', (req, res) => {
-  console.log('POST /mcp');
+  const reqLogger = createRequestLogger(req);
+  reqLogger.info('POST /mcp', {
+    testMode: req.body['test-mode']
+  });
 
   // Test modes support different mock responses and asserting received values.
   switch (req.body['test-mode']) {
@@ -47,5 +51,5 @@ app.post('/mcp', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Fake MCP Server listening on port ${port}`)
+  logger.info('Fake MCP Server listening', { port });
 });
