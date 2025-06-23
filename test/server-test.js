@@ -13,6 +13,7 @@ describe('Server', function () {
       });
     });
   });
+
   describe('with environment', function () {
     // loaded from .env-test by npm test script
     const env = process.env;
@@ -20,7 +21,7 @@ describe('Server', function () {
 
     let authProxyServer;
     let mcpServerProc;
-    
+
     beforeEach(function(done) {
       try {
         server(env, (a, b) => {
@@ -49,7 +50,7 @@ describe('Server', function () {
         });
         authProxyServer= null;
       } else {
-        done()
+        done();
       }
     });
 
@@ -81,12 +82,12 @@ describe('Server', function () {
             res.on("data", (chunk) => {
               resBody = resBody + chunk;
             });
-        
+
             res.on("end", () => {
               try {
                 let parsedBody = JSON.parse(resBody);
                 assert.equal(parsedBody.issuer, env.BASE_URL);
-                done()
+                done();
               } catch (err) {
                 done(err);
               }
@@ -128,6 +129,71 @@ describe('Server', function () {
         });
         req.write(postData);
         req.end();
+      });
+    });
+
+    describe('Applying rate limit', function () {
+      it('should return a 429 for exceeding MAX_REQUESTS_PER_MINUTE', function (done) {
+        const options = {
+          protocol: authProxyUrl.protocol,
+          hostname: authProxyUrl.hostname,
+          port: authProxyUrl.port,
+          path: '/.well-known/oauth-authorization-server',
+          method: 'GET'
+        };
+
+        let responsesReceived = 0;
+        let testCompleted = false;
+
+        function checkCompletion(firstStatus, secondStatus) {
+          responsesReceived++;
+          if (responsesReceived === 2 && !testCompleted) {
+            testCompleted = true;
+            try {
+              // One request should succeed (200) and one should be rate limited (429)
+              const statuses = [firstStatus, secondStatus].sort();
+              assert.equal(statuses[0], 200, 'One request should succeed with 200');
+              assert.equal(statuses[1], 429, 'One request should be rate limited with 429');
+              done();
+            } catch (err) {
+              done(err);
+            }
+          }
+        }
+
+        let firstStatus, secondStatus;
+
+        // First request
+        let req1 = http.request(
+          options,
+          (res) => {
+            firstStatus = res.statusCode;
+            checkCompletion(firstStatus, secondStatus);
+          }
+        );
+        req1.on('error', (e) => {
+          if (!testCompleted) {
+            testCompleted = true;
+            done(e);
+          }
+        });
+        req1.end();
+
+        // Second request (sent immediately to trigger rate limit)
+        let req2 = http.request(
+          options,
+          (res) => {
+            secondStatus = res.statusCode;
+            checkCompletion(firstStatus, secondStatus);
+          }
+        );
+        req2.on('error', (e) => {
+          if (!testCompleted) {
+            testCompleted = true;
+            done(e);
+          }
+        });
+        req2.end();
       });
     });
   });
