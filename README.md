@@ -171,6 +171,21 @@ npm test
 
 This script runs `mocha` with the environment loaded from `.env-test`.
 
+### Integration
+
+End-to-end browser tests that require a live MCP Server and a test account.
+
+```
+export CHROME_EXECUTABLE='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+export TEST_SUBJECT_URL='https://mcp.staging.herokudev.com/mcp'
+export TEST_HEROKU_USERNAME='test-account@example.com'
+export TEST_HEROKU_PASSWORD='test-password'
+
+export TEST_HEADLESS=false # for local debugging
+
+rm -rf ~/.mcp-auth && npm run testint
+```
+
 ## Debug
 
 ```
