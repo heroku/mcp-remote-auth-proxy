@@ -43,7 +43,7 @@ it('Authorizes mcp-remote-client using OAuth', async function() {
     await page.goto(url);
   });
 
-  const runPromise = parseCommandLineArgs([
+  const runMcpRemoteClient = parseCommandLineArgs([
     TEST_SUBJECT_URL
     ],
     'Test usage <https://server-url> [callback-port] [--debug]')
@@ -51,8 +51,9 @@ it('Authorizes mcp-remote-client using OAuth', async function() {
         return connectClient(serverUrl, callbackPort, headers, transportStrategy, host, staticOAuthClientMetadata, staticOAuthClientInfo)
       })
       .then(({server, transport, client}) => {
+        // Create a Promise to ressolve when a streaming JSON RPC message is received, 
+        // so that we can test the MCP Server response.
         let { promise, resolve, reject } = Promise.withResolvers();
-
         transport.onmessage = (message) => {
           // console.log('Received message:', JSON.stringify(message, null, 2));
           resolve(message);
@@ -69,6 +70,9 @@ it('Authorizes mcp-remote-client using OAuth', async function() {
         const abortRequest = new AbortController();
         client.request({ method: 'tools/list' }, ListToolsResultSchema, { signal: abortRequest.signal });
 
+        // Attempt to close everything, but the tests still hang, so `mocha --exit` 
+        // (see the package.json "testint" script) must be used to shutdown the test 
+        // process after this resolves.
         return promise
           .then((result) => {
             client.close();
@@ -97,10 +101,11 @@ it('Authorizes mcp-remote-client using OAuth', async function() {
   const bodyHandle = await page.$('body');
   const innerText = await page.evaluate(body => body.innerText, bodyHandle);
   await bodyHandle.dispose();
+
+  assert.match(innerText, /Authorization successful!/, 'the web browser OAuth flow should complete with authorization granted');
   
-  assert.match(innerText, /Authorization successful!/);
-  
-  const toolsListMessage = await runPromise;
-  assert(toolsListMessage?.result?.tools, 'should receive JSON RPC message containing results.tools');
+  const toolsListMessage = await runMcpRemoteClient;
+
+  assert(toolsListMessage?.result?.tools, 'the mcp-remote-client should receive JSON RPC message containing results.tools');
 
 }).timeout(30000);
