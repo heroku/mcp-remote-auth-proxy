@@ -1,7 +1,8 @@
 import assert from 'assert';
 import puppeteer from 'puppeteer-core';
 import { registerBrowserOpen } from '@heroku/mcp-remote/dist/lib/node-oauth-client-provider.js';
-import { runClient, parseCommandLineArgs } from '@heroku/mcp-remote/dist/lib/run-client.js';
+import { connectClient, parseCommandLineArgs } from '@heroku/mcp-remote/dist/lib/run-client.js';
+import { ListToolsResultSchema } from '@modelcontextprotocol/sdk/types.js'
 
 const {
   CHROME_EXECUTABLE,
@@ -42,15 +43,40 @@ it('Authorizes mcp-remote-client using OAuth', async function() {
     await page.goto(url);
   });
 
-  parseCommandLineArgs([
+  const runPromise = parseCommandLineArgs([
     TEST_SUBJECT_URL
     ],
     'Test usage <https://server-url> [callback-port] [--debug]')
       .then(({ serverUrl, callbackPort, headers, transportStrategy, host, staticOAuthClientMetadata, staticOAuthClientInfo }) => {
-        return runClient(serverUrl, callbackPort, headers, transportStrategy, host, staticOAuthClientMetadata, staticOAuthClientInfo)
+        return connectClient(serverUrl, callbackPort, headers, transportStrategy, host, staticOAuthClientMetadata, staticOAuthClientInfo)
       })
-      .then(() => {
-        console.log("RUN COMPLETE");
+      .then(({server, transport, client}) => {
+        let { promise, resolve, reject } = Promise.withResolvers();
+
+        transport.onmessage = (message) => {
+          // console.log('Received message:', JSON.stringify(message, null, 2));
+          resolve(message);
+        }
+        transport.onerror = (error) => {
+          reject(error);
+        }
+        transport.onclose = () => {
+          reject(new Error('Connection closed'));
+        }
+
+        // This JSON RPC request seems to be stuck open, so we cannot await it
+        // and it makes the test hang. Using Abort Controller to kill it.
+        const abortRequest = new AbortController();
+        client.request({ method: 'tools/list' }, ListToolsResultSchema, { signal: abortRequest.signal });
+
+        return promise
+          .then((result) => {
+            client.close();
+            transport.close();
+            server.close();
+            abortRequest.abort();
+            return result;
+          });
       })
       .catch((error) => {
         throw new Error(`mcp-remote-client failed: ${error}`);
@@ -71,6 +97,10 @@ it('Authorizes mcp-remote-client using OAuth', async function() {
   const bodyHandle = await page.$('body');
   const innerText = await page.evaluate(body => body.innerText, bodyHandle);
   await bodyHandle.dispose();
-
+  
   assert.match(innerText, /Authorization successful!/);
+  
+  const toolsListMessage = await runPromise;
+  assert(toolsListMessage?.result?.tools, 'should receive JSON RPC message containing results.tools');
+
 }).timeout(30000);
