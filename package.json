@@ -8,10 +8,14 @@
   "scripts": {
     "postinstall": "patch-package",
     "test": "DOTENV_CONFIG_PATH=.env-test mocha -r dotenv/config",
-    "start": "node index.js"
+    "start": "node --import=./telemetry.js --experimental-loader=@opentelemetry/instrumentation/hook.mjs index.js"
   },
   "license": "ISC",
   "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.60.1",
+    "@opentelemetry/sdk-node": "^0.202.0",
+    "@opentelemetry/sdk-trace-node": "^2.0.1",
     "desm": "^1.3.1",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
