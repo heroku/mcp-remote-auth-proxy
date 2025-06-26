@@ -3,5 +3,5 @@
 cat << EOF
 ---
 default_process_types:
-  web: node mcp-auth-proxy/index.js
+  web: cd mcp-auth-proxy/ && npm start
 EOF
