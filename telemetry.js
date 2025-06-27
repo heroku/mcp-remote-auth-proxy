@@ -18,3 +18,10 @@ const sdk = new NodeSDK({
 });
 
 sdk.start();
+
+process.on('SIGTERM', () => {
+  sdk.shutdown()
+    .then(() => console.info('Tracing terminated'))
+    .catch((err) => console.error('Error terminating tracing', err))
+    .finally(() => process.exit(0));
+});
