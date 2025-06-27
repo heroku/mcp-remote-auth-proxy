@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import './telemetry.js';
 
 import server from './lib/server.js';
 
