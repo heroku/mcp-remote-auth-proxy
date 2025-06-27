@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "patch-package",
     "test": "DOTENV_CONFIG_PATH=.env-test mocha -r dotenv/config",
-    "start": "node --import=./telemetry.js --experimental-loader=@opentelemetry/instrumentation/hook.mjs index.js"
+    "start": "node --import=./telemetry.js index.js"
   },
   "license": "ISC",
   "dependencies": {
