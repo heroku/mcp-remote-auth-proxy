@@ -3,5 +3,5 @@
 cat << EOF
 ---
 default_process_types:
-  web: node --import=mcp-auth-proxy/telemetry.js mcp-auth-proxy/index.js
+  web: node mcp-auth-proxy/index.js
 EOF
