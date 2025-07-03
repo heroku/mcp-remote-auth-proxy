@@ -127,6 +127,23 @@ Now the Heroku app should be ready to build & launch. In the Heroku Dashboard, s
 
 * using https://github.com/rakutentech/jwkgen to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks)
 * Redis aka KeyValueStore is required, set in `MCP_AUTH_PROXY_REDIS_URL`
+* NPM token is required for private npm registry access
+
+## Setup
+
+First, set up your NPM token for private registry access:
+
+```bash
+# Add to your shell profile (.bashrc, .zshrc, etc.)
+export NPM_TOKEN="your-npm-token-here"
+```
+
+**Note**: The NPM token is required in multiple environments:
+- **Local development**: Set `NPM_TOKEN` environment variable
+- **GitHub Actions**: Set `NODE_TOKEN` in repository secrets
+- **Production**: Set `NPM_TOKEN` in your deployment environment
+
+Then install dependencies and configure the app:
 
 ```
 npm install

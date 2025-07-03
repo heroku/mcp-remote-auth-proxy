@@ -5,6 +5,7 @@ on: push
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    environment: ci
     name: Node Tests
 
     services:
@@ -25,4 +26,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
+        env:
+          NPM_TOKEN: ${{ secrets.NODE_TOKEN }}
       - run: npm test
