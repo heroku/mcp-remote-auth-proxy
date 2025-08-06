@@ -39,6 +39,10 @@ Key-Value store is required for clients & authorizations storage.
 heroku addons:create heroku-redis:private-3 --as=MCP_AUTH_PROXY_REDIS
 ```
 
+### Credential Handling with TLS
+
+While MCP Auth Proxy exists in a controlled environment via Private Space, developers may want to use their own self-signed certificates. To support this flexibility, the MCP Auth Proxy sets `rejectUnauthorized` to `false` for all TLS configuration settings.
+
 ## Auth Proxy Base URL
 
 Set the base URL for the auth proxy to the public-facing https hostname of the Heroku app. Should be a custom domain name for real deployments. This is self-referential in auth flow redirect URIs:
