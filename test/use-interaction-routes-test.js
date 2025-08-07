@@ -332,4 +332,64 @@ describe('useInteractionRoutes', function() {
       assert(error instanceof Error, 'should pass an Error to next');
     });
   });
+
+  describe('general error handling', function() {
+    it('should handle provider.interactionDetails errors', async function() {
+      useInteractionRoutes(mockApp, mockProvider);
+
+      // Mock provider to throw error
+      mockProvider.interactionDetails.rejects(new Error('Provider error'));
+
+      // Get the GET route handler
+      const getCalls = mockApp.get.getCalls();
+      const interactionRoute = getCalls.find(call => 
+        call.args[0] === '/interaction/:uid'
+      );
+      const routeHandler = interactionRoute.args[2];
+
+      const mockReq = { params: { uid: 'test-uid' } };
+      const mockRes = { render: sinon.stub() };
+      const mockNext = sinon.stub();
+
+      await routeHandler(mockReq, mockRes, mockNext);
+
+      // Should call next with error
+      assert(mockNext.calledOnce, 'should call next with error');
+      const error = mockNext.getCall(0).args[0];
+      assert(error instanceof Error, 'should pass an Error to next');
+      assert(error.message.includes('Provider error'), 'should pass the original error');
+    });
+
+    it('should handle Client.find errors', async function() {
+      useInteractionRoutes(mockApp, mockProvider);
+
+      const mockInteractionDetails = {
+        uid: 'test-uid',
+        prompt: { name: 'confirm-login', details: {}, reasons: ['test'] },
+        params: { client_id: 'test-client' },
+        session: {}
+      };
+
+      mockProvider.interactionDetails.resolves(mockInteractionDetails);
+      mockProvider.Client.find.rejects(new Error('Client not found'));
+
+      const getCalls = mockApp.get.getCalls();
+      const interactionRoute = getCalls.find(call => 
+        call.args[0] === '/interaction/:uid'
+      );
+      const routeHandler = interactionRoute.args[2];
+
+      const mockReq = { params: { uid: 'test-uid' } };
+      const mockRes = { render: sinon.stub() };
+      const mockNext = sinon.stub();
+
+      await routeHandler(mockReq, mockRes, mockNext);
+
+      // Should call next with error
+      assert(mockNext.calledOnce, 'should call next with error');
+      const error = mockNext.getCall(0).args[0];
+      assert(error instanceof Error, 'should pass an Error to next');
+      assert(error.message.includes('Client not found'), 'should pass the client error');
+    });
+  });
 });
