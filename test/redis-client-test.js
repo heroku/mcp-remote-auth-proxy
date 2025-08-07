@@ -139,5 +139,59 @@ describe('RedisClient', function() {
       
       assert.equal(underlyingClient, mockRedisInstance);
     });
+
+    it('should delegate hset operations', async function() {
+      mockRedisInstance.hset.resolves(1);
+
+      const result = await client.hset('test:key', 'field', 'value');
+
+      assert(mockRedisInstance.hset.calledWith('test:key', 'field', 'value'));
+      assert.equal(result, 1);
+    });
+
+    it('should delegate hmset operations', async function() {
+      mockRedisInstance.hmset.resolves('OK');
+
+      const result = await client.hmset('test:key', { field1: 'value1', field2: 'value2' });
+
+      assert(mockRedisInstance.hmset.calledWith('test:key', { field1: 'value1', field2: 'value2' }));
+      assert.equal(result, 'OK');
+    });
+
+    it('should delegate rpush operations', async function() {
+      mockRedisInstance.rpush.resolves(2);
+
+      const result = await client.rpush('test:list', 'item');
+
+      assert(mockRedisInstance.rpush.calledWith('test:list', 'item'));
+      assert.equal(result, 2);
+    });
+
+    it('should delegate lrange operations', async function() {
+      mockRedisInstance.lrange.resolves(['item1', 'item2']);
+
+      const result = await client.lrange('test:list', 0, -1);
+
+      assert(mockRedisInstance.lrange.calledWith('test:list', 0, -1));
+      assert.deepEqual(result, ['item1', 'item2']);
+    });
+
+    it('should delegate ttl operations', async function() {
+      mockRedisInstance.ttl.resolves(300);
+
+      const result = await client.ttl('test:key');
+
+      assert(mockRedisInstance.ttl.calledWith('test:key'));
+      assert.equal(result, 300);
+    });
+
+    it('should delegate expire operations', async function() {
+      mockRedisInstance.expire.resolves(1);
+
+      const result = await client.expire('test:key', 3600);
+
+      assert(mockRedisInstance.expire.calledWith('test:key', 3600));
+      assert.equal(result, 1);
+    });
   });
 });
