@@ -104,4 +104,108 @@ describe('useInteractionRoutes', function() {
     // Verify app.render was called
     assert(mockApp.render.called, 'should call app.render');
   });
+
+  describe('setNoCache middleware', function() {
+    it('should set cache-control header and call next', function() {
+      useInteractionRoutes(mockApp, mockProvider);
+
+      // Find the GET route handler to extract setNoCache
+      const getCalls = mockApp.get.getCalls();
+      const interactionRoute = getCalls.find(call => 
+        call.args[0] === '/interaction/:uid'
+      );
+      
+      assert(interactionRoute, 'should find interaction route');
+      
+      // setNoCache should be the second argument (after path, before handler)
+      const setNoCache = interactionRoute.args[1];
+      assert.equal(typeof setNoCache, 'function', 'setNoCache should be a function');
+
+      // Test setNoCache middleware
+      const mockReq = {};
+      const mockRes = { set: sinon.stub() };
+      const mockNext = sinon.stub();
+
+      setNoCache(mockReq, mockRes, mockNext);
+
+      assert(mockRes.set.calledWith('cache-control', 'no-store'), 'should set cache-control header');
+      assert(mockNext.calledOnce, 'should call next()');
+    });
+  });
+
+  describe('GET /interaction/:uid route', function() {
+    it('should handle confirm-login prompt', async function() {
+      useInteractionRoutes(mockApp, mockProvider);
+
+      // Mock provider responses
+      const mockInteractionDetails = {
+        uid: 'test-uid',
+        prompt: { name: 'confirm-login', details: { test: 'details' }, reasons: ['test'] },
+        params: { client_id: 'test-client' },
+        session: {}
+      };
+      const mockClient = { id: 'test-client' };
+
+      mockProvider.interactionDetails.resolves(mockInteractionDetails);
+      mockProvider.Client.find.resolves(mockClient);
+
+      // Get the route handler
+      const getCalls = mockApp.get.getCalls();
+      const interactionRoute = getCalls.find(call => 
+        call.args[0] === '/interaction/:uid'
+      );
+      const routeHandler = interactionRoute.args[2]; // Skip setNoCache middleware
+
+      // Mock req/res
+      const mockReq = { params: { uid: 'test-uid' } };
+      const mockRes = { render: sinon.stub() };
+      const mockNext = sinon.stub();
+
+      await routeHandler(mockReq, mockRes, mockNext);
+
+      // Verify interactions
+      assert(mockProvider.interactionDetails.calledWith(mockReq, mockRes), 'should call interactionDetails');
+      assert(mockProvider.Client.find.calledWith('test-client'), 'should find client');
+      assert(mockRes.render.calledWith('confirm-login'), 'should render confirm-login view');
+      
+      // Check render arguments
+      const renderArgs = mockRes.render.getCall(0).args[1];
+      assert.equal(renderArgs.client, mockClient, 'should pass client');
+      assert.equal(renderArgs.uid, 'test-uid', 'should pass uid');
+      assert.equal(renderArgs.title, 'Confirm Login', 'should pass title');
+    });
+
+    it('should handle unknown prompt with error', async function() {
+      useInteractionRoutes(mockApp, mockProvider);
+
+      const mockInteractionDetails = {
+        uid: 'test-uid',
+        prompt: { name: 'unknown-prompt', details: {}, reasons: ['test'] },
+        params: { client_id: 'test-client' },
+        session: {}
+      };
+      const mockClient = { id: 'test-client' };
+
+      mockProvider.interactionDetails.resolves(mockInteractionDetails);
+      mockProvider.Client.find.resolves(mockClient);
+
+      const getCalls = mockApp.get.getCalls();
+      const interactionRoute = getCalls.find(call => 
+        call.args[0] === '/interaction/:uid'
+      );
+      const routeHandler = interactionRoute.args[2];
+
+      const mockReq = { params: { uid: 'test-uid' } };
+      const mockRes = { render: sinon.stub(), redirect: sinon.stub() };
+      const mockNext = sinon.stub();
+
+      await routeHandler(mockReq, mockRes, mockNext);
+
+      // Should call next with error
+      assert(mockNext.calledOnce, 'should call next with error');
+      const error = mockNext.getCall(0).args[0];
+      assert(error instanceof Error, 'should pass an Error to next');
+      assert(error.message.includes('unknown-prompt'), 'error should mention unknown prompt');
+    });
+  });
 });
