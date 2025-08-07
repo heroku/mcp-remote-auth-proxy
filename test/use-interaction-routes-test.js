@@ -208,4 +208,128 @@ describe('useInteractionRoutes', function() {
       assert(error.message.includes('unknown-prompt'), 'error should mention unknown prompt');
     });
   });
+
+  describe('POST /interaction/:uid/confirm-login route', function() {
+    it('should handle confirmed login', async function() {
+      useInteractionRoutes(mockApp, mockProvider);
+
+      const mockInteractionDetails = {
+        uid: 'test-uid',
+        prompt: { name: 'confirm-login', details: {}, reasons: ['test'] },
+        params: { client_id: 'test-client' },
+        session: {}
+      };
+      const mockClient = { 
+        clientId: 'test-client-id',
+        metadata: sinon.stub().returns({ test: 'metadata' })
+      };
+
+      mockProvider.interactionDetails.resolves(mockInteractionDetails);
+      mockProvider.Client.find.resolves(mockClient);
+      mockProvider.Client.adapter.upsert.resolves();
+      mockProvider.interactionFinished.resolves();
+
+      // Get the POST route handler
+      const postCalls = mockApp.post.getCalls();
+      const confirmLoginRoute = postCalls.find(call => 
+        call.args[0] === '/interaction/:uid/confirm-login'
+      );
+      const routeHandler = confirmLoginRoute.args[3]; // Skip setNoCache and body middleware
+
+      const mockReq = { 
+        params: { uid: 'test-uid' },
+        body: { confirmed: 'true' }
+      };
+      const mockRes = {};
+      const mockNext = sinon.stub();
+
+      await routeHandler(mockReq, mockRes, mockNext);
+
+      // Verify interactions
+      assert(mockProvider.interactionDetails.calledWith(mockReq, mockRes), 'should call interactionDetails');
+      assert(mockProvider.Client.find.calledWith('test-client'), 'should find client');
+      assert.equal(mockClient.identityLoginConfirmed, true, 'should set client identityLoginConfirmed');
+      assert(mockProvider.Client.adapter.upsert.calledWith('test-client-id'), 'should upsert client');
+      assert(mockProvider.interactionFinished.calledWith(mockReq, mockRes), 'should finish interaction');
+      
+      // Check interaction result
+      const finishedArgs = mockProvider.interactionFinished.getCall(0).args;
+      const result = finishedArgs[2];
+      assert.deepEqual(result, {
+        'confirm-login': { confirmed: true }
+      }, 'should pass correct result');
+    });
+
+    it('should handle rejected login', async function() {
+      useInteractionRoutes(mockApp, mockProvider);
+
+      const mockInteractionDetails = {
+        uid: 'test-uid',
+        prompt: { name: 'confirm-login', details: {}, reasons: ['test'] },
+        params: { client_id: 'test-client' },
+        session: {}
+      };
+
+      mockProvider.interactionDetails.resolves(mockInteractionDetails);
+      mockProvider.interactionFinished.resolves();
+
+      const postCalls = mockApp.post.getCalls();
+      const confirmLoginRoute = postCalls.find(call => 
+        call.args[0] === '/interaction/:uid/confirm-login'
+      );
+      const routeHandler = confirmLoginRoute.args[3];
+
+      const mockReq = { 
+        params: { uid: 'test-uid' },
+        body: { confirmed: 'false' }
+      };
+      const mockRes = {};
+      const mockNext = sinon.stub();
+
+      await routeHandler(mockReq, mockRes, mockNext);
+
+      // Should NOT find client or upsert when not confirmed
+      assert(mockProvider.Client.find.notCalled, 'should not find client for rejected login');
+      assert(mockProvider.Client.adapter.upsert.notCalled, 'should not upsert for rejected login');
+      
+      // Should still finish interaction with empty result
+      assert(mockProvider.interactionFinished.calledWith(mockReq, mockRes), 'should finish interaction');
+      const finishedArgs = mockProvider.interactionFinished.getCall(0).args;
+      const result = finishedArgs[2];
+      assert.deepEqual(result, {}, 'should pass empty result for rejection');
+    });
+
+    it('should handle prompt name assertion error', async function() {
+      useInteractionRoutes(mockApp, mockProvider);
+
+      const mockInteractionDetails = {
+        uid: 'test-uid',
+        prompt: { name: 'wrong-prompt', details: {}, reasons: ['test'] },
+        params: { client_id: 'test-client' },
+        session: {}
+      };
+
+      mockProvider.interactionDetails.resolves(mockInteractionDetails);
+
+      const postCalls = mockApp.post.getCalls();
+      const confirmLoginRoute = postCalls.find(call => 
+        call.args[0] === '/interaction/:uid/confirm-login'
+      );
+      const routeHandler = confirmLoginRoute.args[3];
+
+      const mockReq = { 
+        params: { uid: 'test-uid' },
+        body: { confirmed: 'true' }
+      };
+      const mockRes = {};
+      const mockNext = sinon.stub();
+
+      await routeHandler(mockReq, mockRes, mockNext);
+
+      // Should call next with assertion error
+      assert(mockNext.calledOnce, 'should call next with error');
+      const error = mockNext.getCall(0).args[0];
+      assert(error instanceof Error, 'should pass an Error to next');
+    });
+  });
 });
