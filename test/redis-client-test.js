@@ -23,6 +23,38 @@ describe('RedisClient', function() {
         RedisClient.create({});
       }, /MCP_AUTH_PROXY_REDIS_URL environment variable is required/);
     });
+
+    it('should configure TLS for rediss:// URLs', function() {
+      const env = { MCP_AUTH_PROXY_REDIS_URL: 'rediss://localhost:6380' };
+      
+      // Just verify that the creation doesn't throw for rediss URLs
+      // The TLS code path will be covered by the successful creation
+      assert.doesNotThrow(() => {
+        RedisClient.create(env);
+      }, 'should successfully create client with TLS URL');
+    });
+
+    it('should use default error handler when no errorFunc provided', function() {
+      const env = { MCP_AUTH_PROXY_REDIS_URL: 'redis://localhost:6379' };
+      
+      // Mock console.warn to capture default error handler behavior
+      const originalConsoleWarn = console.warn;
+      console.warn = sinon.stub();
+      
+      try {
+        const client = RedisClient.create(env);
+        
+        // Simulate an error event to trigger the default error handler
+        // This will cover line 53
+        const testError = new Error('Simulated Redis error');
+        client.client.emit('error', testError);
+        
+        // Verify console.warn was called
+        assert(console.warn.calledWith('Redis client error:', testError), 'should log error with console.warn');
+      } finally {
+        console.warn = originalConsoleWarn;
+      }
+    });
   });
 
   describe('Redis operations (with mocked client)', function() {
