@@ -14,6 +14,31 @@ describe('Server', function () {
     });
   });
 
+  describe('with invalid environment', function () {
+    it('should crash with invalid MCP_SERVER_URL', function () {
+      const invalidEnv = {
+        BASE_URL: 'http://localhost:3001',
+        MCP_SERVER_URL: 'not-a-valid-url'
+      };
+      
+      assert.throws(() => server(invalidEnv), {
+        message: 'MCP_SERVER_URL must be a valid URL'
+      });
+    });
+
+    it('should crash with invalid OIDC_PROVIDER_VIEWS_PATH', function () {
+      const invalidEnv = {
+        BASE_URL: 'http://localhost:3001',
+        MCP_SERVER_URL: 'http://localhost:3000',
+        OIDC_PROVIDER_VIEWS_PATH: '/non/existent/path'
+      };
+      
+      assert.throws(() => server(invalidEnv), {
+        message: 'The configured OIDC_PROVIDER_VIEWS_PATH does not exist, /non/existent/path'
+      });
+    });
+  });
+
   describe('with environment', function () {
     // loaded from .env-test by npm test script
     const env = process.env;
