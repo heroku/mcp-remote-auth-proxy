@@ -3,7 +3,7 @@ import { Buffer } from 'node:buffer';
 import assert from 'assert';
 
 import server from '../lib/server.js';
-import RedisAdapter from "../lib/redis-adapter.js";
+import TokenRedisAdapter from "../lib/token-redis-adapter.js";
 
 describe('Server', function () {
   describe('without environment', function () {
@@ -39,7 +39,7 @@ describe('Server', function () {
     });
 
     afterEach(function(done) {
-      RedisAdapter.disconnect();
+      TokenRedisAdapter.disconnect();
       if (mcpServerProc) {
         mcpServerProc.kill();
         mcpServerProc = null;
@@ -60,7 +60,7 @@ describe('Server', function () {
     });
 
     it('should be connected to Redis', async function () {
-      const redisInfo = await RedisAdapter.client.info();
+      const redisInfo = await TokenRedisAdapter.client.info();
       assert(redisInfo);
     });
 
