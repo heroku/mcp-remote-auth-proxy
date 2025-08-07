@@ -195,6 +195,46 @@ describe('TokenRedisAdapter', function() {
         assert(mockMulti.expire.calledWith('grant:grant-123', 3600));
         assert(mockMulti.exec.calledOnce);
       });
+
+      it('should handle tokens with userCode', async function() {
+        // Test case to cover lines 88-91: userCode logic
+        const mockMulti = {
+          set: sinon.stub(),
+          expire: sinon.stub(),
+          exec: sinon.stub().resolves([])
+        };
+        mockIoredisInstance.multi.returns(mockMulti);
+
+        const payload = { token: 'value', userCode: 'USER123' };
+        await adapter.upsert('test-id', payload, 3600);
+
+        // Should set the main token
+        assert(mockMulti.set.calledWith('AccessToken:test-id', JSON.stringify(payload)));
+        // Should set userCode mapping (lines 88-91)
+        assert(mockMulti.set.calledWith('userCode:USER123', 'test-id'));
+        assert(mockMulti.expire.calledWith('userCode:USER123', 3600));
+        assert(mockMulti.exec.calledOnce);
+      });
+
+      it('should handle tokens with uid', async function() {
+        // Test case to cover lines 94-97: uid logic
+        const mockMulti = {
+          set: sinon.stub(),
+          expire: sinon.stub(),
+          exec: sinon.stub().resolves([])
+        };
+        mockIoredisInstance.multi.returns(mockMulti);
+
+        const payload = { token: 'value', uid: 'UID456' };
+        await adapter.upsert('test-id', payload, 3600);
+
+        // Should set the main token
+        assert(mockMulti.set.calledWith('AccessToken:test-id', JSON.stringify(payload)));
+        // Should set uid mapping (lines 94-97)
+        assert(mockMulti.set.calledWith('uid:UID456', 'test-id'));
+        assert(mockMulti.expire.calledWith('uid:UID456', 3600));
+        assert(mockMulti.exec.calledOnce);
+      });
     });
 
     describe('find', function() {
