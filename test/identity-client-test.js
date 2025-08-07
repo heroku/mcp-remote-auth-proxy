@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import { writeFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
-import { identityClientInit, identityClient, identityProviderMetadata } from '../lib/identity-client.js';
+import { identityClientInit, identityClient, identityProviderMetadata, refreshIdentityToken } from '../lib/identity-client.js';
 import logger from '../lib/logger.js'; // Import logger to mock it
 
 describe('identityClientInit', function() {
@@ -144,5 +144,66 @@ describe('identityClientInit', function() {
       assert(discoveryStub.calledOnce, 'discovery should be attempted');
       assert(loggerErrorStub.calledWith('Error using OpenID Connect Discovery'), 'Should log error');
     });
+  });
+});
+
+describe('refreshIdentityToken', function() {
+  let refreshTokenGrantStub;
+  
+  beforeEach(function() {
+    // Mock the refreshTokenGrant method
+    refreshTokenGrantStub = sinon.stub(identityClient, 'refreshTokenGrant');
+  });
+
+  afterEach(function() {
+    sinon.restore();
+  });
+
+  it('should successfully refresh token and update client', async function() {
+    // Mock the refresh token grant response
+    const mockTokenResponse = {
+      access_token: 'new_access_token',
+      signature: 'new_signature',  
+      scope: 'openid profile',
+      token_type: 'Bearer',
+      issued_at: 1234567890
+    };
+    refreshTokenGrantStub.resolves(mockTokenResponse);
+
+    // Mock provider and client  
+    const mockUpsert = sinon.stub().resolves();
+    const mockProvider = {
+      Client: {
+        adapter: {
+          upsert: mockUpsert
+        }
+      }
+    };
+    const mockClient = {
+      clientId: 'test_client_id',
+      identityAuthRefreshToken: 'old_refresh_token',
+      metadata: sinon.stub().returns({ test: 'metadata' })
+    };
+
+    // Since module was already initialized by previous tests, this should work
+    await refreshIdentityToken(mockProvider, mockClient);
+
+    // Verify refreshTokenGrant was called correctly
+    assert(refreshTokenGrantStub.calledOnce, 'refreshTokenGrant should be called once');
+    const grantArgs = refreshTokenGrantStub.getCall(0).args;
+    assert.equal(grantArgs[1], 'old_refresh_token', 'should pass refresh token');
+
+    // Verify client was updated with new token data
+    assert.equal(mockClient.identityAuthAccessToken, 'new_access_token', 'should update access token');
+    assert.equal(mockClient.identityAuthSignature, 'new_signature', 'should update signature');
+    assert.equal(mockClient.identityAuthScope, 'openid profile', 'should update scope');
+    assert.equal(mockClient.identityAuthTokenType, 'Bearer', 'should update token type');
+    assert.equal(mockClient.identityAuthIssuedAt, 1234567890, 'should update issued at');
+
+    // Verify upsert was called with correct parameters
+    assert(mockUpsert.calledOnce, 'upsert should be called once');
+    const upsertArgs = mockUpsert.getCall(0).args;
+    assert.equal(upsertArgs[0], 'test_client_id', 'should pass client ID');
+    assert.deepEqual(upsertArgs[1], { test: 'metadata' }, 'should pass client metadata');
   });
 });
