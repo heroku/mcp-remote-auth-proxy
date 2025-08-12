@@ -31,7 +31,7 @@ describe('Logger', function () {
       assert(logLine.includes(message), `Log line should contain message: ${message}`);
       assert(logLine.includes('foo=bar'), 'Log line should contain foo=bar');
       assert(logLine.includes('baz=123'), 'Log line should contain baz=123');
-      assert(logLine.includes('app=mcp-heroku-com'), 'Log line should contain app name');
+      assert(logLine.includes('app=mcp-auth-proxy'), 'Log line should contain app name');
       assert(logLine.includes('proxy=true'), 'Log line should contain proxy=true');
     });
   });
@@ -106,7 +106,7 @@ describe('Logger', function () {
         const logLine = loggedArgs[0];
 
         assert(logLine.includes('Hello, world!'), 'Log line should contain message');
-        assert(logLine.includes('app=mcp-heroku-com'), 'Log line should contain app name');
+        assert(logLine.includes('app=mcp-auth-proxy'), 'Log line should contain app name');
         assert(logLine.includes('proxy=true'), 'Log line should contain proxy=true');
       });
     });
