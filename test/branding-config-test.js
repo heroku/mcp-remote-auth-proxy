@@ -15,13 +15,6 @@ describe('Branding Configuration', function() {
   });
 
   describe('isHerokuProvider', function() {
-    it('should return true when BRANDING_PROVIDER is set to heroku', function() {
-      // Clear any conflicting values from .env-test
-      delete process.env.IDENTITY_SERVER_URL;
-      process.env.BRANDING_PROVIDER = 'heroku';
-      assert(isHerokuProvider(), 'Should detect Heroku when BRANDING_PROVIDER is set to heroku');
-    });
-
     it('should return true when IDENTITY_SERVER_URL contains heroku.com', function() {
       process.env.IDENTITY_SERVER_URL = 'https://id.heroku.com/';
       assert(isHerokuProvider(), 'Should detect Heroku when IDENTITY_SERVER_URL contains heroku.com');
@@ -37,10 +30,9 @@ describe('Branding Configuration', function() {
       assert(!isHerokuProvider(), 'Should not detect Heroku for generic providers');
     });
 
-    it('should return false when no relevant environment variables are set', function() {
-      delete process.env.BRANDING_PROVIDER;
+    it('should return false when no IDENTITY_SERVER_URL is set', function() {
       delete process.env.IDENTITY_SERVER_URL;
-      assert(!isHerokuProvider(), 'Should not detect Heroku when no relevant env vars are set');
+      assert(!isHerokuProvider(), 'Should not detect Heroku when IDENTITY_SERVER_URL is not set');
     });
   });
 
@@ -60,8 +52,7 @@ describe('Branding Configuration', function() {
       const config = getBrandingConfig();
       
       assert(!config.title.includes('Heroku'), 'Title should not include Heroku');
-      assert(config.favicon === '/favicon.svg', 'Should use generic favicon');
-      assert(config.colors.primary === '#4a5568', 'Should use generic primary color');
+      assert(config.colors.primary === '#a7bcd9', 'Should use generic primary color');
       assert(config.colors.background.includes('linear-gradient'), 'Should use generic gradient background');
     });
 
@@ -79,6 +70,14 @@ describe('Branding Configuration', function() {
       const config = getBrandingConfig();
       
       assert(config.favicon === 'https://example.com/custom-favicon.ico', 'Should use custom favicon');
+    });
+
+    it('should use undefined favicon when BRANDING_FAVICON is not provided for generic branding', function() {
+      delete process.env.BRANDING_FAVICON;
+      process.env.IDENTITY_SERVER_URL = 'https://auth.example.com/';
+      const config = getBrandingConfig();
+
+      assert(config.favicon === undefined, 'Should use undefined favicon when not provided');
     });
 
     it('should append Heroku to custom title when Heroku is detected', function() {
