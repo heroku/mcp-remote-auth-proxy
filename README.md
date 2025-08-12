@@ -67,6 +67,35 @@ heroku config:set \
   OIDC_PROVIDER_VIEWS_PATH=/app/support/auth-views
 ```
 
+## Branding Customization
+
+The Auth Proxy automatically detects and applies branding based on the Identity Provider URL. You can also customize the branding appearance using environment variables.
+
+### Custom Branding Properties
+
+You can customize the branding appearance using these environment variables:
+
+#### `BRANDING_TITLE`
+Customizes the page title displayed in the browser tab and page header.
+- **Default**: `"Login for Model Context Protocol"`
+- **Example**: `heroku config:set BRANDING_TITLE="My Custom Auth Service"`
+
+#### `BRANDING_FAVICON`
+Sets a custom favicon URL for the authentication pages.
+- **Default**: `undefined` (no favicon)
+- **Example**: `heroku config:set BRANDING_FAVICON="https://example.com/custom-favicon.ico"`
+
+### Branding Color Scheme
+
+#### Generic Branding (Default)
+The default brand color scheme can be found in `branding-config.js`:
+- **Primary**: `#a7bcd9` (muted blue)
+- **Secondary**: `#718096` (gray)
+- **Background**: Linear gradient from `#f7fafc` to `#e2e8f0` (light gray to white)
+- **Text**: `#2d3748` (dark gray)
+- **Text Muted**: `#718096` (medium gray)
+- **Border**: `#bbc2c9` (light gray)
+
 ## MCP Server URL & Command
 
 Set the internal, local URL for the proxy to reach the MCP Server, and the command to start it, overriding whatever the `PORT` is already set to be by Heroku runtime. For example:
