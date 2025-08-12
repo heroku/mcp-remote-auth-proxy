@@ -87,14 +87,17 @@ Sets a custom favicon URL for the authentication pages.
 
 ### Branding Color Scheme
 
-#### Generic Branding (Default)
 The default brand color scheme can be found in `branding-config.js`:
-- **Primary**: `#a7bcd9` (muted blue)
-- **Secondary**: `#718096` (gray)
-- **Background**: Linear gradient from `#f7fafc` to `#e2e8f0` (light gray to white)
-- **Text**: `#2d3748` (dark gray)
-- **Text Muted**: `#718096` (medium gray)
-- **Border**: `#bbc2c9` (light gray)
+```javascript
+colors: {
+  primary: '#a7bcd9',
+  secondary: '#718096',
+  background: 'linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%)',
+  text: '#2d3748',
+  textMuted: '#718096',
+  border: '#bbc2c9'
+}
+```
 
 ## MCP Server URL & Command
 
