@@ -15,7 +15,7 @@ jobs:
   action:
     runs-on: sfdc-hk-ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Send data to Components Inventory
         uses: heroku/components-action@main
         with:
