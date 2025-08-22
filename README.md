@@ -10,27 +10,6 @@ Originally based on [node-oidc-provider Express.js example](https://github.com/p
 
 With a new Heroku app, created in a Private Space, for an MCP Server repo like [mcp-heroku-com](https://github.com/heroku/mcp-heroku-com)…
 
-## Buildpacks
-
-Add the required buildpacks for this auth proxy. Ensure that `mcp-remote-auth-proxy` is always last, so that its [default web process](bin/release) is launched.
-
-```bash
-heroku buildpacks:add --index 1 https://github.com/heroku/heroku-buildpack-github-netrc.git
-heroku buildpacks:set --index 2 heroku/nodejs
-heroku buildpacks:set --index 3 https://github.com/heroku/mcp-remote-auth-proxy.git
-```
-
-If a different language than Node.js for the MCP Server, then insert that buildpack before `mcp-remote-auth-proxy`.
-
-### GitHub User Token for `mcp-remote-auth-proxy` buildpack
-
-[Create a GitHub auth token](https://github.com/heroku/heroku-buildpack-github-netrc) for the app to access the private mcp-remote-auth-proxy repo:
-
-```bash
-heroku config:set \
-  GITHUB_AUTH_TOKEN=xxxxx
-```
-
 ## Key-Value Store
 
 Key-Value store is required for clients & authorizations storage.
@@ -105,7 +84,7 @@ Set the internal, local URL for the proxy to reach the MCP Server, and the comma
 
 ```bash
 heroku config:set \
-  MCP_SERVER_URL=http://localhost:3000/mcp \  
+  MCP_SERVER_URL=http://localhost:3000/mcp \
   MCP_SERVER_RUN_COMMAND="npm" \
   MCP_SERVER_RUN_ARGS_JSON='["start"]' \
   MCP_SERVER_RUN_DIR="/Users/mars.hall/Projects/mcp-heroku-com" \
@@ -123,7 +102,7 @@ heroku config:set \
 
 ## Identity Provider OAuth Client
 
-Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) `BASE_URL` origin. 
+Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) `BASE_URL` origin.
 
 For example, Heroku Identity:
 
@@ -145,14 +124,14 @@ heroku config:set \
 
 ### Non-OIDC Providers
 
-Optionally, for Identity providers that do not support OIDC discovery, 
+Optionally, for Identity providers that do not support OIDC discovery,
 reference a [ServerMetadata JSON file](https://github.com/panva/openid-client/blob/v6.x/docs/interfaces/ServerMetadata.md), containing: `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, & `"scopes_supported"`.
 
 For example, Heroku Identity staging (or production) requires,
 
 ```bash
 heroku config:set \
-  IDENTITY_SERVER_METADATA_FILE='/app/mcp-auth-proxy/heroku_identity_staging_metadata.json'
+  IDENTITY_SERVER_METADATA_FILE='/app/heroku_identity_staging_metadata.json'
 ```
 
 ## Build & Launch 🚀
@@ -197,7 +176,7 @@ We use [patch-package](https://www.npmjs.com/package/patch-package) to perform t
 Patching is configured with:
 1. [`package.json`](package.json) `postinstall` script
 2. code diffs in [`patches/`](patches/)
-3. create or update a patch `npm exec patch-package MODULE_NAME` 
+3. create or update a patch `npm exec patch-package MODULE_NAME`
 
 ## Testing
 
