@@ -6,7 +6,7 @@ This app is intended be deployed as an MCP Auth Proxy within a Heroku app for a 
 
 Originally based on [node-oidc-provider Express.js example](https://github.com/panva/node-oidc-provider/blob/main/example/express.js).
 
-# Deployment
+# Standalone Deployment
 
 With a new Heroku app, created in a Private Space, for an MCP Server repo like [mcp-heroku-com](https://github.com/heroku/mcp-heroku-com)…
 
@@ -137,6 +137,10 @@ heroku config:set \
 ## Build & Launch 🚀
 
 Now the Heroku app should be ready to build & launch. In the Heroku Dashboard, start a new deployment for the app.
+
+# Buildpack Deployment
+
+Install the [Remote MCP Auth Proxy Buildpack](https://github.com/heroku/heroku-buildpack-mcp-auth-proxy) to deploy this repository as a buildpack alongside a remote MCP server.
 
 # Development
 
