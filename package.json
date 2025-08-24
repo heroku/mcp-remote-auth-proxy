@@ -29,7 +29,7 @@
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "nanoid": "^5.1.5",
-    "oidc-provider": "^9.2.0",
+    "oidc-provider": "^9.4.2",
     "openid-client": "^6.6.2",
     "patch-package": "^8.0.0",
     "rate-limit-redis": "^4.2.1",
