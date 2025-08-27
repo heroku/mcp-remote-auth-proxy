@@ -8,30 +8,13 @@ Originally based on [node-oidc-provider Express.js example](https://github.com/p
 
 # Deployment
 
+This server is installed to your MCP server Heroku app via the [Heroku Buildpack MCP Auth Proxy](https://github.com/heroku/heroku-buildpack-mcp-auth-proxy#quick-setup).
+
+## Configuration
+
 With a new Heroku app, created in a Private Space, for an MCP Server repo like [mcp-heroku-com](https://github.com/heroku/mcp-heroku-com)…
 
-## Buildpacks
-
-Add the required buildpacks for this auth proxy. Ensure that `mcp-remote-auth-proxy` is always last, so that its [default web process](bin/release) is launched.
-
-```bash
-heroku buildpacks:add --index 1 https://github.com/heroku/heroku-buildpack-github-netrc.git
-heroku buildpacks:set --index 2 heroku/nodejs
-heroku buildpacks:set --index 3 https://github.com/heroku/mcp-remote-auth-proxy.git
-```
-
-If a different language than Node.js for the MCP Server, then insert that buildpack before `mcp-remote-auth-proxy`.
-
-### GitHub User Token for `mcp-remote-auth-proxy` buildpack
-
-[Create a GitHub auth token](https://github.com/heroku/heroku-buildpack-github-netrc) for the app to access the private mcp-remote-auth-proxy repo:
-
-```bash
-heroku config:set \
-  GITHUB_AUTH_TOKEN=xxxxx
-```
-
-## Key-Value Store
+### Key-Value Store
 
 Key-Value store is required for clients & authorizations storage.
 
@@ -39,11 +22,7 @@ Key-Value store is required for clients & authorizations storage.
 heroku addons:create heroku-redis:private-3 --as=MCP_AUTH_PROXY_REDIS
 ```
 
-### Credential Handling with TLS
-
-While MCP Auth Proxy exists in a controlled environment via Private Space, developers may want to use their own self-signed certificates. To support this flexibility, the MCP Auth Proxy sets `rejectUnauthorized` to `false` for all TLS configuration settings.
-
-## Auth Proxy Base URL
+### Auth Proxy Base URL
 
 Set the base URL for the auth proxy to the public-facing https hostname of the Heroku app. Should be a custom domain name for real deployments. This is self-referential in auth flow redirect URIs:
 
@@ -52,7 +31,7 @@ heroku config:set \
   BASE_URL=https://mcp-heroku-com-with-auth-proxy-5f63807b3fb0.herokuapp.com
 ```
 
-## Auth Proxy Views Directory
+### Auth Proxy Views Directory
 
 The Auth Proxy leverages EJS for templating of interaction views. As of this writing, the only templates required are `confirm-login.ejs` and `_layout.ejs`.
 
@@ -64,14 +43,14 @@ For example, to use a directory such as `/support/auth-views` committed along wi
 
 ```
 heroku config:set \
-  OIDC_PROVIDER_VIEWS_PATH=/app/support/auth-views
+  OIDC_PROVIDER_VIEWS_PATH=/app/mcp-auth-proxy/mcp-auth-proxy/support/auth-views
 ```
 
-## Branding Customization
+### Branding Customization
 
 The Auth Proxy automatically detects and applies branding based on the Identity Provider URL. You can also customize the branding appearance using environment variables.
 
-### Custom Branding Properties
+#### Custom Branding Properties
 
 You can customize the branding appearance using these environment variables:
 
@@ -85,7 +64,7 @@ Sets a custom favicon URL for the authentication pages.
 - **Default**: `undefined` (no favicon)
 - **Example**: `heroku config:set BRANDING_FAVICON="https://example.com/custom-favicon.ico"`
 
-### Branding Color Scheme
+#### Branding Color Scheme
 
 The default brand color scheme can be found in `branding-config.js`:
 ```javascript
@@ -99,20 +78,20 @@ colors: {
 }
 ```
 
-## MCP Server URL & Command
+### MCP Server URL & Command
 
 Set the internal, local URL for the proxy to reach the MCP Server, and the command to start it, overriding whatever the `PORT` is already set to be by Heroku runtime. For example:
 
 ```bash
 heroku config:set \
-  MCP_SERVER_URL=http://localhost:3000/mcp \  
+  MCP_SERVER_URL=http://localhost:3000/mcp \
   MCP_SERVER_RUN_COMMAND="npm" \
   MCP_SERVER_RUN_ARGS_JSON='["start"]' \
   MCP_SERVER_RUN_DIR="/Users/mars.hall/Projects/mcp-heroku-com" \
   MCP_SERVER_RUN_ENV_JSON='{"PORT":3000,"HEROKU_API_URL":"https://api.staging.herokudev.com"}'
 ```
 
-## Auth Proxy Provider Cryptography
+### Auth Proxy Provider Cryptography
 
 Generate the cryptographic material for the auth proxy. Uses https://github.com/rakutentech/jwkgen to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks):
 
@@ -121,9 +100,9 @@ heroku config:set \
   OIDC_PROVIDER_JWKS="[$(jwkgen --jwk)]"
 ```
 
-## Identity Provider OAuth Client
+### Identity Provider OAuth Client
 
-Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) `BASE_URL` origin. 
+Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) `BASE_URL` origin.
 
 For example, Heroku Identity:
 
@@ -143,9 +122,9 @@ heroku config:set \
   IDENTITY_SCOPE=global
 ```
 
-### Non-OIDC Providers
+#### Non-OIDC Providers
 
-Optionally, for Identity providers that do not support OIDC discovery, 
+Optionally, for Identity providers that do not support OIDC discovery,
 reference a [ServerMetadata JSON file](https://github.com/panva/openid-client/blob/v6.x/docs/interfaces/ServerMetadata.md), containing: `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, & `"scopes_supported"`.
 
 For example, Heroku Identity staging (or production) requires,
@@ -155,9 +134,13 @@ heroku config:set \
   IDENTITY_SERVER_METADATA_FILE='/app/mcp-auth-proxy/heroku_identity_staging_metadata.json'
 ```
 
-## Build & Launch 🚀
+### Build & Launch 🚀
 
 Now the Heroku app should be ready to build & launch. In the Heroku Dashboard, start a new deployment for the app.
+
+# Buildpack Deployment
+
+Install the [Remote MCP Auth Proxy Buildpack](https://github.com/heroku/heroku-buildpack-mcp-auth-proxy) to deploy this repository as a buildpack alongside a remote MCP server.
 
 # Development
 
@@ -197,7 +180,7 @@ We use [patch-package](https://www.npmjs.com/package/patch-package) to perform t
 Patching is configured with:
 1. [`package.json`](package.json) `postinstall` script
 2. code diffs in [`patches/`](patches/)
-3. create or update a patch `npm exec patch-package MODULE_NAME` 
+3. create or update a patch `npm exec patch-package MODULE_NAME`
 
 ## Testing
 

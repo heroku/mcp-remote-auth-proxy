@@ -1,5 +1,0 @@
-#!/bin/sh
-# Usage: bin/detect <build-dir>
-
-echo "MCP Auth Proxy"
-exit 0
