@@ -1,7 +1,5 @@
 # OAuth proxy for remote Model Context Protocol servers
 
-Heroku RFC: [Authorization Proxy for Remote MCP Servers](https://salesforce.quip.com/TtBWAC0Ub9eJ).
-
 This app is intended be deployed as an MCP Auth Proxy within a Heroku app for a Remote MCP Server, although it can be run as a separate free-standing proxy app.
 
 Originally based on [node-oidc-provider Express.js example](https://github.com/panva/node-oidc-provider/blob/main/example/express.js).
