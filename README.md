@@ -26,7 +26,7 @@ Set the base URL for the auth proxy to the public-facing https hostname of the H
 
 ```bash
 heroku config:set \
-  BASE_URL=https://example-mcp-heroku-app-with-auth-proxy-5f63807b3fb0.herokuapp.com
+  BASE_URL=https://<app-subdomain>.herokuapp.com
 ```
 
 ### Auth Proxy Views Directory
@@ -75,7 +75,7 @@ colors: {
 }
 ```
 
-### MCP Server URL & Command
+### MCP Server URL and Command
 
 Set the internal, local URL for the proxy to reach the MCP Server, and the command to start it, by overriding the `PORT` set by Heroku runtime. For example:
 
@@ -84,7 +84,7 @@ heroku config:set \
   MCP_SERVER_URL=http://localhost:3000/mcp \
   MCP_SERVER_RUN_COMMAND="npm" \
   MCP_SERVER_RUN_ARGS_JSON='["start"]' \
-  MCP_SERVER_RUN_DIR="/Users/mars.hall/Projects/mcp-heroku-com" \
+  MCP_SERVER_RUN_DIR="/app/mcp-heroku-com" \
   MCP_SERVER_RUN_ENV_JSON='{"PORT":3000,"HEROKU_API_URL":"https://api.staging.herokudev.com"}'
 ```
 
@@ -99,12 +99,10 @@ heroku config:set \
 
 ### Identity Provider OAuth Client
 
-Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) (`BASE_URL`) origin.
-
-For example, for Heroku Identity:
+Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) (`BASE_URL`) origin. For example, for Heroku Identity:
 
 ```bash
-heroku clients:create mcp-heroku-com-with-auth-proxy 'https://mcp-heroku-com-with-auth-proxy-5f63807b3fb0.herokuapp.com/interaction/identity/callback'
+heroku clients:create mcp-heroku-com-with-auth-proxy 'https://<app-subdomain>.herokuapp.com/interaction/identity/callback'
 ```
 
 > Each identity provider has its own process/interface to create OAuth clients. Please see their documentation for instructions.
@@ -121,7 +119,7 @@ heroku config:set \
 
 #### Non-OIDC Providers
 
-Optionally, for Identity providers that do not support OIDC discovery,
+Optionally, for identity providers that do not support OIDC discovery,
 reference a [ServerMetadata JSON file](https://github.com/panva/openid-client/blob/v6.x/docs/interfaces/ServerMetadata.md) that contains the `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, and `"scopes_supported"` fields.
 
 For example, Heroku Identity staging (or production) requires:
@@ -153,8 +151,8 @@ echo "OIDC_PROVIDER_JWKS='[$(jwkgen --jwk)]'" >> .env
 
 Inspect `.env` to fill in missing values:
 
-* `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET`, and `IDENTITY_SCOPE` should be set for the upstream/primary Identity OAuth provider (like a Heroku OAuth client, or Salesforce External Client App) to provide the API access required by the MCP server's tools.
-* The redirect URL for the Identity OAuth client must use the path `/interaction/identity/callback`, such as `http://localhost:3001/interaction/identity/callback` for local development.
+* `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET`, and `IDENTITY_SCOPE` should be set for the upstream/primary identity OAuth provider (like a Heroku OAuth client, or Salesforce External Client App) to provide the API access required by the MCP server's tools.
+* The redirect URL for the identity OAuth client must use the path `/interaction/identity/callback`, such as `http://localhost:3001/interaction/identity/callback` for local development.
 
 Start NPM:
 
@@ -170,7 +168,7 @@ rm -rf ~/.mcp-auth && npx -y @modelcontextprotocol/inspector npx -y mcp-remote@n
 
 Run the MCP server itself at `http://localhost:3000`.
 
-When you visit MCP Inspector at `http://localhost:6274` and click **Connect**, you should be redirected to the Identity OAuth flow, as configured by the `IDENTITY_*` env variables.
+When you visit MCP Inspector at `http://localhost:6274` and click **Connect**, you should be redirected to the identity OAuth flow, as configured by the `IDENTITY_*` env variables.
 
 ## Patching Third-party Packages
 
