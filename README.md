@@ -10,7 +10,7 @@ This app uses the [Heroku Buildpack MCP Auth Proxy](https://github.com/heroku/he
 
 ## Configuration
 
-Configure a new Heroku app you've created in a [Private Space](https://devcenter.heroku.com/articles/private-spaces) for an [MCP Server repo](https://github.com/heroku/mcp-heroku-com) with the following steps.
+Configure a new Heroku app you've created in a [Private Space](https://devcenter.heroku.com/articles/private-spaces) for an MCP Server that requires authorization for MCP clients.
 
 ### Key-Value Store
 
@@ -84,8 +84,8 @@ heroku config:set \
   MCP_SERVER_URL=http://localhost:3000/mcp \
   MCP_SERVER_RUN_COMMAND="npm" \
   MCP_SERVER_RUN_ARGS_JSON='["start"]' \
-  MCP_SERVER_RUN_DIR="/app/mcp-heroku-com" \
-  MCP_SERVER_RUN_ENV_JSON='{"PORT":3000,"HEROKU_API_URL":"https://api.staging.herokudev.com"}'
+  MCP_SERVER_RUN_DIR="/app" \
+  MCP_SERVER_RUN_ENV_JSON='{"PORT":3000,"BACKEND_API_URL":"https://identity.example.com"}'
 ```
 
 ### Auth Proxy Provider Cryptography
@@ -99,11 +99,7 @@ heroku config:set \
 
 ### Identity Provider OAuth Client
 
-Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) (`BASE_URL`) origin. For example, for Heroku Identity:
-
-```bash
-heroku clients:create mcp-heroku-com-with-auth-proxy 'https://<app-subdomain>.herokuapp.com/interaction/identity/callback'
-```
+Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) (`BASE_URL`) origin.
 
 > Each identity provider has its own process/interface to create OAuth clients. Please see their documentation for instructions.
 
@@ -111,7 +107,7 @@ Once created, set the client ID, secret, Identity Provider URL, and OAuth scope 
 
 ```bash
 heroku config:set \
-  IDENTITY_SERVER_URL=https://identity.staging.herokudev.com \
+  IDENTITY_SERVER_URL=xxxxx \
   IDENTITY_CLIENT_ID=yyyyy \
   IDENTITY_CLIENT_SECRET=zzzzz \
   IDENTITY_SCOPE=global
@@ -121,13 +117,6 @@ heroku config:set \
 
 Optionally, for identity providers that do not support OIDC discovery,
 reference a [ServerMetadata JSON file](https://github.com/panva/openid-client/blob/v6.x/docs/interfaces/ServerMetadata.md) that contains the `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, and `"scopes_supported"` fields.
-
-For example, Heroku Identity staging (or production) requires:
-
-```bash
-heroku config:set \
-  IDENTITY_SERVER_METADATA_FILE='/app/mcp-auth-proxy/heroku_identity_staging_metadata.json'
-```
 
 ### Deployment
 
