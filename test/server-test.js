@@ -47,23 +47,7 @@ describe('Server', function () {
     let authProxyServer;
     let mcpServerProc;
 
-    beforeEach(function(done) {
-      try {
-        server(env, (a, b) => {
-          authProxyServer = a;
-          mcpServerProc = b;
-          done();
-        }, (code) => {
-          if (code !== 0) {
-            assert(false, `Server exited code=${code} before tests completed. Check for errors logged above.`);
-          }
-        });
-      } catch (err) {
-        done(err);
-      }
-    });
-
-    afterEach(function(done) {
+    function resetServer(done) {
       TokenRedisAdapter.disconnect();
       if (mcpServerProc) {
         mcpServerProc.kill();
@@ -73,152 +57,197 @@ describe('Server', function () {
         authProxyServer.close((err) => {
           err ? done(err) : done();
         });
-        authProxyServer= null;
+        authProxyServer = null;
       } else {
         done();
       }
+    };
+
+    describe('verifies the release', function () {
+      const verifyEnv = {
+        ...env,
+        MCP_AUTH_PROXY_VERIFY_RELEASE: 'true'
+      };
+
+      afterEach(resetServer);
+      
+      it('server launches and then exits success', function (done) {
+        assert.doesNotThrow(() => {
+          server(verifyEnv, (a, b) => {
+            authProxyServer = a;
+            mcpServerProc = b;
+            done();
+          }, (code) => {
+            if (code !== 0) {
+              assert(false, `Server exited code=${code} before tests completed. Check for errors logged above.`);
+            }
+          });
+        }, {
+          message: 'MCP_AUTH_PROXY_VERIFY_RELEASE should make server exit successfully'
+        });
+      });
     });
 
-    it('should start successfully', function () {
-      assert(authProxyServer.listening);
-      assert(mcpServerProc.pid > 0);
-    });
+    describe('launches the server', function () {
+      beforeEach(function(done) {
+        try {
+          server(env, (a, b) => {
+            authProxyServer = a;
+            mcpServerProc = b;
+            done();
+          }, (code) => {
+            if (code !== 0) {
+              assert(false, `Server exited code=${code} before tests completed. Check for errors logged above.`);
+            }
+          });
+        } catch (err) {
+          done(err);
+        }
+      });
 
-    it('should be connected to Redis', async function () {
-      const redisInfo = await TokenRedisAdapter.client.info();
-      assert(redisInfo);
-    });
+      afterEach(resetServer);
 
-    describe('GET /.well-known/oauth-authorization-server', function () {
-      it('should respond with JSON metadata', function (done) {
-        const options = {
-          protocol: authProxyUrl.protocol,
-          hostname: authProxyUrl.hostname,
-          port: authProxyUrl.port,
-          path: '/.well-known/oauth-authorization-server',
-          method: 'GET'
-        };
-        const req = http.request(
-          options,
-          (res) => {
-            assert.equal(res.statusCode, 200);
-            let resBody = '';
+      it('should start successfully', function () {
+        assert(authProxyServer.listening);
+        assert(mcpServerProc.pid > 0);
+      });
 
-            res.on("data", (chunk) => {
-              resBody = resBody + chunk;
-            });
+      it('should be connected to Redis', async function () {
+        const redisInfo = await TokenRedisAdapter.client.info();
+        assert(redisInfo);
+      });
 
-            res.on("end", () => {
+      describe('GET /.well-known/oauth-authorization-server', function () {
+        it('should respond with JSON metadata', function (done) {
+          const options = {
+            protocol: authProxyUrl.protocol,
+            hostname: authProxyUrl.hostname,
+            port: authProxyUrl.port,
+            path: '/.well-known/oauth-authorization-server',
+            method: 'GET'
+          };
+          const req = http.request(
+            options,
+            (res) => {
+              assert.equal(res.statusCode, 200);
+              let resBody = '';
+
+              res.on("data", (chunk) => {
+                resBody = resBody + chunk;
+              });
+
+              res.on("end", () => {
+                try {
+                  let parsedBody = JSON.parse(resBody);
+                  assert.equal(parsedBody.issuer, env.BASE_URL);
+                  done();
+                } catch (err) {
+                  done(err);
+                }
+              });
+            }
+          );
+          req.on('error', (e) => {
+            done(e);
+          });
+          req.end();
+        });
+      });
+
+      describe('POST /mcp without authorization', function () {
+        it('should be rejected by Auth Proxy', function (done) {
+          const postData = JSON.stringify({
+            'msg': 'Hello World!',
+          });
+          const options = {
+            protocol: authProxyUrl.protocol,
+            hostname: authProxyUrl.hostname,
+            port: authProxyUrl.port,
+            path: '/mcp',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(postData),
+            }
+          };
+          const req = http.request(
+            options,
+            (res) => {
+              assert.equal(res.statusCode, 401);
+              done();
+            }
+          );
+          req.on('error', (e) => {
+            done(e);
+          });
+          req.write(postData);
+          req.end();
+        });
+      });
+
+      describe('Applying rate limit', function () {
+        it('should return a 429 for exceeding MAX_REQUESTS_PER_MINUTE', function (done) {
+          const options = {
+            protocol: authProxyUrl.protocol,
+            hostname: authProxyUrl.hostname,
+            port: authProxyUrl.port,
+            path: '/.well-known/oauth-authorization-server',
+            method: 'GET'
+          };
+
+          let responsesReceived = 0;
+          let testCompleted = false;
+
+          function checkCompletion(firstStatus, secondStatus) {
+            responsesReceived++;
+            if (responsesReceived === 2 && !testCompleted) {
+              testCompleted = true;
               try {
-                let parsedBody = JSON.parse(resBody);
-                assert.equal(parsedBody.issuer, env.BASE_URL);
+                // One request should succeed (200) and one should be rate limited (429)
+                const statuses = [firstStatus, secondStatus].sort();
+                assert.equal(statuses[0], 200, 'One request should succeed with 200');
+                assert.equal(statuses[1], 429, 'One request should be rate limited with 429');
                 done();
               } catch (err) {
                 done(err);
               }
-            });
-          }
-        );
-        req.on('error', (e) => {
-          done(e);
-        });
-        req.end();
-      });
-    });
-
-    describe('POST /mcp without authorization', function () {
-      it('should be rejected by Auth Proxy', function (done) {
-        const postData = JSON.stringify({
-          'msg': 'Hello World!',
-        });
-        const options = {
-          protocol: authProxyUrl.protocol,
-          hostname: authProxyUrl.hostname,
-          port: authProxyUrl.port,
-          path: '/mcp',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(postData),
-          }
-        };
-        const req = http.request(
-          options,
-          (res) => {
-            assert.equal(res.statusCode, 401);
-            done();
-          }
-        );
-        req.on('error', (e) => {
-          done(e);
-        });
-        req.write(postData);
-        req.end();
-      });
-    });
-
-    describe('Applying rate limit', function () {
-      it('should return a 429 for exceeding MAX_REQUESTS_PER_MINUTE', function (done) {
-        const options = {
-          protocol: authProxyUrl.protocol,
-          hostname: authProxyUrl.hostname,
-          port: authProxyUrl.port,
-          path: '/.well-known/oauth-authorization-server',
-          method: 'GET'
-        };
-
-        let responsesReceived = 0;
-        let testCompleted = false;
-
-        function checkCompletion(firstStatus, secondStatus) {
-          responsesReceived++;
-          if (responsesReceived === 2 && !testCompleted) {
-            testCompleted = true;
-            try {
-              // One request should succeed (200) and one should be rate limited (429)
-              const statuses = [firstStatus, secondStatus].sort();
-              assert.equal(statuses[0], 200, 'One request should succeed with 200');
-              assert.equal(statuses[1], 429, 'One request should be rate limited with 429');
-              done();
-            } catch (err) {
-              done(err);
             }
           }
-        }
 
-        let firstStatus, secondStatus;
+          let firstStatus, secondStatus;
 
-        // First request
-        let req1 = http.request(
-          options,
-          (res) => {
-            firstStatus = res.statusCode;
-            checkCompletion(firstStatus, secondStatus);
-          }
-        );
-        req1.on('error', (e) => {
-          if (!testCompleted) {
-            testCompleted = true;
-            done(e);
-          }
+          // First request
+          let req1 = http.request(
+            options,
+            (res) => {
+              firstStatus = res.statusCode;
+              checkCompletion(firstStatus, secondStatus);
+            }
+          );
+          req1.on('error', (e) => {
+            if (!testCompleted) {
+              testCompleted = true;
+              done(e);
+            }
+          });
+          req1.end();
+
+          // Second request (sent immediately to trigger rate limit)
+          let req2 = http.request(
+            options,
+            (res) => {
+              secondStatus = res.statusCode;
+              checkCompletion(firstStatus, secondStatus);
+            }
+          );
+          req2.on('error', (e) => {
+            if (!testCompleted) {
+              testCompleted = true;
+              done(e);
+            }
+          });
+          req2.end();
         });
-        req1.end();
-
-        // Second request (sent immediately to trigger rate limit)
-        let req2 = http.request(
-          options,
-          (res) => {
-            secondStatus = res.statusCode;
-            checkCompletion(firstStatus, secondStatus);
-          }
-        );
-        req2.on('error', (e) => {
-          if (!testCompleted) {
-            testCompleted = true;
-            done(e);
-          }
-        });
-        req2.end();
       });
     });
   });
