@@ -85,7 +85,7 @@ heroku config:set \
   MCP_SERVER_RUN_COMMAND="npm" \
   MCP_SERVER_RUN_ARGS_JSON='["start"]' \
   MCP_SERVER_RUN_DIR="/app" \
-  MCP_SERVER_RUN_ENV_JSON='{"PORT":3000,"BACKEND_API_URL":"https://identity.example.com"}'
+  MCP_SERVER_RUN_ENV_JSON='{"PORT":3000,"BACKEND_API_URL":"https://mcp.example.com"}'
 ```
 
 ### Auth Proxy Provider Cryptography
@@ -107,7 +107,7 @@ After creating it, set the client ID, secret, Identity Provider URL, and OAuth s
 
 ```bash
 heroku config:set \
-  IDENTITY_SERVER_URL=xxxxx \
+  IDENTITY_SERVER_URL=https://identity.example.com \
   IDENTITY_CLIENT_ID=yyyyy \
   IDENTITY_CLIENT_SECRET=zzzzz \
   IDENTITY_SCOPE=global
