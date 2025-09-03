@@ -1,6 +1,0 @@
-{
-  "issuer": "https://identity.staging.herokudev.com/",
-  "authorization_endpoint": "https://identity.staging.herokudev.com/oauth/authorize",
-  "token_endpoint": "https://identity.staging.herokudev.com/oauth/token",
-  "scopes_supported": "global"
-}

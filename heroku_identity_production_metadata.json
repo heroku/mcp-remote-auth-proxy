@@ -1,6 +1,0 @@
-{
-  "issuer": "https://id.heroku.com/",
-  "authorization_endpoint": "https://id.heroku.com/oauth/authorize",
-  "token_endpoint": "https://id.heroku.com/oauth/token",
-  "scopes_supported": "global"
-}

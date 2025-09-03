@@ -21,7 +21,7 @@ describe('Branding Configuration', function() {
     });
 
     it('should return true when IDENTITY_SERVER_URL contains herokudev.com', function() {
-      process.env.IDENTITY_SERVER_URL = 'https://identity.staging.herokudev.com';
+      process.env.IDENTITY_SERVER_URL = 'https://example-herokudev.com';
       assert(isHerokuProvider(), 'Should detect Heroku when IDENTITY_SERVER_URL contains herokudev.com');
     });
 
