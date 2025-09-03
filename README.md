@@ -10,11 +10,11 @@ This app uses the [Heroku Buildpack MCP Auth Proxy](https://github.com/heroku/he
 
 ## Configuration
 
-Configure a new Heroku app you've created in a [Private Space](https://devcenter.heroku.com/articles/private-spaces) for an MCP Server that requires authorization for MCP clients.
+Configure a new Heroku app you created in a [Private Space](https://devcenter.heroku.com/articles/private-spaces) for an MCP Server that requires authorization for MCP clients.
 
 ### Key-Value Store
 
-[Heroku Key-Value store](https://devcenter.heroku.com/articles/heroku-redis) (KVS) with Redis is required for client and authorization storage. To provision KVS, run:
+[Heroku Key-Value Store](https://devcenter.heroku.com/articles/heroku-redis) (KVS) with Redis is required for client and authorization storage. To provision KVS, run:
 
 ```bash
 heroku addons:create heroku-redis:private-3 --as=MCP_AUTH_PROXY_REDIS
@@ -22,7 +22,7 @@ heroku addons:create heroku-redis:private-3 --as=MCP_AUTH_PROXY_REDIS
 
 ### Auth Proxy Base URL
 
-Set the base URL for the auth proxy to the public-facing https hostname of the Heroku app. The base URL is self-referential in auth flow redirect URIs. If you plan to deploy the app, use a [custom domain name](https://devcenter.heroku.com/articles/custom-domains).
+Set the base URL for the auth proxy to the public-facing HTTPS hostname of the Heroku app. The base URL is self-referential in auth flow redirect URIs. If you plan to deploy the app, use a [custom domain name](https://devcenter.heroku.com/articles/custom-domains).
 
 ```bash
 heroku config:set \
@@ -44,18 +44,18 @@ heroku config:set \
 
 ### Brand Customization
 
-The auth proxy automatically detects and applies branding based on the Identity Provider URL (IdP). You can also customize the branding appearance with the following environment variables.
+The auth proxy automatically detects and applies branding based on the Identity Provider (IdP) URL. You can also customize the branding appearance with the following environment variables.
 
 #### `BRANDING_TITLE`
 
-Use BRANDING_TITLE to customize the page title displayed in the browser tab and page header.
+Use `BRANDING_TITLE` to customize the page title displayed in the browser tab and page header.
 
 - **Default**: `"Login for Model Context Protocol"`
 - **Example**: `heroku config:set BRANDING_TITLE="My Custom Auth Service"`
 
 #### `BRANDING_FAVICON`
 
-Use BRANDING_FAVICON to customize the favicon URL for authentication pages.
+Use `BRANDING_FAVICON` to customize the favicon URL for authentication pages.
 
 - **Default**: `undefined` (no favicon)
 - **Example**: `heroku config:set BRANDING_FAVICON="https://example.com/custom-favicon.ico"`
@@ -99,11 +99,11 @@ heroku config:set \
 
 ### Identity Provider OAuth Client
 
-Generate a new static OAuth client for the Identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) (`BASE_URL`) origin.
+Generate a new static OAuth client for the identity provider. This client's redirect URI origin must match the [Auth Proxy Base URL](#auth-proxy-base-url) (`BASE_URL`) origin.
 
-> Each identity provider has its own process/interface to create OAuth clients. Please see their documentation for instructions.
+> Each identity provider has its own process and interface to create OAuth clients. See their documentation for instructions.
 
-Once created, set the client ID, secret, Identity Provider URL, and OAuth scope to be granted with config vars:
+After creating it, set the client ID, secret, Identity Provider URL, and OAuth scope to be granted with config vars:
 
 ```bash
 heroku config:set \
@@ -115,7 +115,7 @@ heroku config:set \
 
 #### Non-OIDC Providers
 
-Optionally, for identity providers that do not support OIDC discovery,
+Optionally, for identity providers that don't support OIDC discovery,
 reference a [ServerMetadata JSON file](https://github.com/panva/openid-client/blob/v6.x/docs/interfaces/ServerMetadata.md) that contains the `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, and `"scopes_supported"` fields.
 
 ### Deployment
@@ -128,8 +128,8 @@ Install the [Remote MCP Auth Proxy Buildpack](https://github.com/heroku/heroku-b
 
 # Development
 
-* Use https://github.com/rakutentech/jwkgen to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks)
-* KeyValueStore with Redis is required, which you can set in `MCP_AUTH_PROXY_REDIS_URL`
+* Use the [JSON Web Key Generator](https://github.com/rakutentech/jwkgen) to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks).
+* Key-Value Store with Redis is required, which you can set in `MCP_AUTH_PROXY_REDIS_URL`
 
 ```
 npm install
@@ -140,7 +140,7 @@ echo "OIDC_PROVIDER_JWKS='[$(jwkgen --jwk)]'" >> .env
 
 Inspect `.env` to fill in missing values:
 
-* `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET`, and `IDENTITY_SCOPE` should be set for the upstream/primary identity OAuth provider (like a Heroku OAuth client, or Salesforce External Client App) to provide the API access required by the MCP server's tools.
+* Set the `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET`, and `IDENTITY_SCOPE` fields in the upstream/primary identity OAuth provider, like a Heroku OAuth client, or Salesforce External Client App. These fields provide the API access required by the MCP server's tools.
 * The redirect URL for the identity OAuth client must use the path `/interaction/identity/callback`, such as `http://localhost:3001/interaction/identity/callback` for local development.
 
 Start NPM:
@@ -157,11 +157,11 @@ rm -rf ~/.mcp-auth && npx -y @modelcontextprotocol/inspector npx -y mcp-remote@n
 
 Run the MCP server itself at `http://localhost:3000`.
 
-When you visit MCP Inspector at `http://localhost:6274` and click **Connect**, you should be redirected to the identity OAuth flow, as configured by the `IDENTITY_*` env variables.
+When you visit MCP Inspector at `http://localhost:6274` and click **`Connect`**, you should be redirected to the identity OAuth flow, as configured by the `IDENTITY_*` env variables.
 
 ## Patching Third-party Packages
 
-Some third-party packages require patches to support the quirks of the emerging MCP Clients. We use [patch-package](https://www.npmjs.com/package/patch-package) for this.
+Some third-party packages require patches to support the quirks of the emerging MCP Clients. We use [patch-package](https://www.npmjs.com/package/patch-package) for patches.
 
 Patching is configured with:
 
