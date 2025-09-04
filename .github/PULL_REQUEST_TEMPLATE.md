@@ -14,19 +14,25 @@ Learn more about [Conventional Commits](https://www.conventionalcommits.org/).
 ## Summary
 <!-- Brief description of the changes in this PR. -->
 
+## Type of Change
+- [ ] **fix**: Bug fix or issue (patch semvar update)
+- [ ] **feat**: Introduces a new feature to the codebase (minor semvar update)
+- [ ] **perf**: Performance improvement
+- [ ] **build**: Changes that affect the build system or external dependencies
+- [ ] **refactor**: Code cleanup tasks that neither fixes a bug nor adds a feature
+- [ ] **docs**: Documentation only changes
+- [ ] **tests**: Adding missing tests or correcting existing tests
+
+Note: Add a `!` after your change type to denote a breaking change.
+
+## Additional Context
+
+<!-- 
+  * For fixes, provide reproduction steps and expected vs actual behavior    
+  * For features, describe the objective and rationale for this change.
+  * If this is a breaking change, describe what functionality is affected and a migration path for existing users
+  * Any additional information, links, screenshots, or attachments that help describe the issue
+-->
+
 ## Related Issue
-
-### Issue Description
-<!-- Brief description of what the issue is -->
-
-### Reproduction Steps
-<!-- Step-by-step instructions to reproduce the issue -->
-
-### Expected Behavior
-<!-- What should happen -->
-
-### Actual Behavior
-<!-- What actually happens -->
-
-### Additional Context
-<!-- Any additional information, links, screenshots, or attachments that help describe the issue -->
+Closes #[Github issue number]
