@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         node-version: [22.x]
-        os: [sfdc-hk-ubuntu-latest]
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v4

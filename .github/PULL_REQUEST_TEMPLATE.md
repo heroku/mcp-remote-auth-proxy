@@ -14,5 +14,19 @@ Learn more about [Conventional Commits](https://www.conventionalcommits.org/).
 ## Summary
 <!-- Brief description of the changes in this PR. -->
 
-## SOC2 Link
-<!-- Link to the work item or slack message that initiated this work for auditing purposes -->
+## Related Issue
+
+### Issue Description
+<!-- Brief description of what the issue is -->
+
+### Reproduction Steps
+<!-- Step-by-step instructions to reproduce the issue -->
+
+### Expected Behavior
+<!-- What should happen -->
+
+### Actual Behavior
+<!-- What actually happens -->
+
+### Additional Context
+<!-- Any additional information, links, screenshots, or attachments that help describe the issue -->
