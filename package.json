@@ -32,12 +32,12 @@
     "oidc-provider": "^9.2.0",
     "openid-client": "^6.6.2",
     "patch-package": "^8.0.0",
-    "rate-limit-redis": "^4.2.1",
+    "rate-limit-redis": "^4.2.2",
     "winston": "^3.17.0"
   },
   "type": "module",
   "devDependencies": {
-    "mocha": "^11.7.1",
+    "mocha": "^11.7.2",
     "sinon": "^21.0.0"
   }
 }
