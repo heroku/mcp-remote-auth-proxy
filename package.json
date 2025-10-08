@@ -2,6 +2,8 @@
   "name": "mcp-remote-auth-provider",
   "version": "0.0.1",
   "description": "OIDC OAuth provider for remote MCP servers",
+  "type": "module",
+  "packageManager": "pnpm@10.18.1",
   "engines": {
     "node": ">=22.16.0"
   },
