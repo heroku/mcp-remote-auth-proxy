@@ -1,8 +1,6 @@
 {
   "all": true,
-  "include": [
-    "lib/**/*.js"
-  ],
+  "include": ["lib/**/*.js"],
   "exclude": [
     "lib/views/**",
     "test/**",
@@ -17,12 +15,7 @@
     "index.js",
     "telemetry.js"
   ],
-  "reporter": [
-    "text",
-    "text-summary",
-    "html",
-    "lcov"
-  ],
+  "reporter": ["text", "text-summary", "html", "lcov"],
   "check-coverage": false,
   "clean": true,
   "temp-directory": "./coverage/tmp"
