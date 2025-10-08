@@ -1,5 +1,5 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http'
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
 import { NetInstrumentation } from '@opentelemetry/instrumentation-net';
@@ -18,7 +18,8 @@ const sdk = new NodeSDK({
 sdk.start();
 
 process.on('SIGTERM', () => {
-  sdk.shutdown()
+  sdk
+    .shutdown()
     .then(() => console.info('Tracing terminated'))
-    .catch((err) => console.error('Error terminating tracing', err))
+    .catch((err) => console.error('Error terminating tracing', err));
 });

@@ -18,16 +18,16 @@ describe('Logger', function () {
     it('should log a splunk-formatted message', function () {
       const message = 'Hello, world!';
       const meta = { foo: 'bar', baz: 123 };
-      
+
       defaultLogger.info(message, meta);
 
       // Assert that stdout.write was called
       assert(stdoutStub.calledOnce, 'process.stdout.write should be called once');
-      
+
       // Get the actual arguments passed to stdout.write
       const loggedArgs = stdoutStub.getCall(0).args;
       const logLine = loggedArgs[0];
-  
+
       assert(logLine.includes(message), `Log line should contain message: ${message}`);
       assert(logLine.includes('foo=bar'), 'Log line should contain foo=bar');
       assert(logLine.includes('baz=123'), 'Log line should contain baz=123');
@@ -46,7 +46,7 @@ describe('Logger', function () {
           path: '/test',
           query: {},
           body: {},
-          headers: {}
+          headers: {},
         };
       });
 
