@@ -71,35 +71,33 @@ export default (app: Application, provider: Provider): void => {
       try {
         const { uid, prompt, params, session } = await provider.interactionDetails(req, res);
 
-        const client = (await provider.Client.find(
-          params.client_id as string
-        )) as AuthProxyClient;
+        const client = (await provider.Client.find(params.client_id as string)) as AuthProxyClient;
 
         switch (prompt.name) {
-        case 'confirm-login': {
-          return res.render('confirm-login', {
-            client,
-            uid,
-            details: prompt.details,
-            params,
-            title: 'Confirm Login',
-            identityServerUrl: IDENTITY_SERVER_URL,
-          });
-        }
-        case 'login': {
-          // Use adapter-based auth URL generation
-          const identity_auth_url = await generateIdentityAuthUrl(
-            req.params.uid,
-            provider,
-            client,
-            BASE_URL || ''
-          );
-          return res.redirect(identity_auth_url);
-        }
-        default:
-          throw new Error(
-            `"${prompt.name}" was requested, but does not exist. Reasons: ${prompt.reasons}, ${JSON.stringify(prompt.details)}`
-          );
+          case 'confirm-login': {
+            return res.render('confirm-login', {
+              client,
+              uid,
+              details: prompt.details,
+              params,
+              title: 'Confirm Login',
+              identityServerUrl: IDENTITY_SERVER_URL,
+            });
+          }
+          case 'login': {
+            // Use adapter-based auth URL generation
+            const identity_auth_url = await generateIdentityAuthUrl(
+              req.params.uid,
+              provider,
+              client,
+              BASE_URL || ''
+            );
+            return res.redirect(identity_auth_url);
+          }
+          default:
+            throw new Error(
+              `"${prompt.name}" was requested, but does not exist. Reasons: ${prompt.reasons}, ${JSON.stringify(prompt.details)}`
+            );
         }
       } catch (err) {
         return next(err);
@@ -171,9 +169,7 @@ export default (app: Application, provider: Provider): void => {
           res
         );
 
-        const client = (await provider.Client.find(
-          params.client_id as string
-        )) as AuthProxyClient;
+        const client = (await provider.Client.find(params.client_id as string)) as AuthProxyClient;
 
         // Extract authorization code from callback
         const code = req.query.code as string;
@@ -196,8 +192,7 @@ export default (app: Application, provider: Provider): void => {
         );
 
         const tokenId =
-          (tokenResponse.userData?.id as string) ||
-          (tokenResponse.userData?.user_id as string);
+          (tokenResponse.userData?.id as string) || (tokenResponse.userData?.user_id as string);
         if (!tokenId) {
           throw new Error('access token must contain either "id" or "user_id"');
         }
@@ -258,19 +253,17 @@ export default (app: Application, provider: Provider): void => {
     }
   );
 
-  app.use(
-    (err: Error, req: Request, res: Response, next: NextFunction) => {
-      if (err instanceof SessionNotFound || err instanceof AccessDenied) {
-        const logger = createRequestLogger(req);
-        logger.warn('Resetting session', {
-          method: req.method,
-          path: req.path,
-          errorName: err.name,
-          errorMessage: err.message,
-        });
-        return res.redirect(getSessionResetUrl());
-      }
-      next(err);
+  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    if (err instanceof SessionNotFound || err instanceof AccessDenied) {
+      const logger = createRequestLogger(req);
+      logger.warn('Resetting session', {
+        method: req.method,
+        path: req.path,
+        errorName: err.name,
+        errorMessage: err.message,
+      });
+      return res.redirect(getSessionResetUrl());
     }
-  );
+    next(err);
+  });
 };
