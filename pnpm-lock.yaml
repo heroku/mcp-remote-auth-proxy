@@ -56,9 +56,6 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
-      mcp-oauth-provider-adapters:
-        specifier: https://github.com/heroku/oauth-provider-adapters-for-mcp
-        version: git+https://git@github.com:heroku/oauth-provider-adapters-for-mcp.git#1987b5563d39d33e555467f8b5f2edaa6ab7deff
       morgan:
         specifier: ^1.10.1
         version: 1.10.1
@@ -1323,11 +1320,6 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mcp-oauth-provider-adapters@git+https://git@github.com:heroku/oauth-provider-adapters-for-mcp.git#1987b5563d39d33e555467f8b5f2edaa6ab7deff:
-    resolution: {commit: 1987b5563d39d33e555467f8b5f2edaa6ab7deff, repo: git@github.com:heroku/oauth-provider-adapters-for-mcp.git, type: git}
-    version: 0.0.0
-    engines: {node: '>=20.0.0'}
-
   media-typer@1.1.0:
     resolution: {integrity: sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==}
     engines: {node: '>= 0.8'}
@@ -1768,9 +1760,6 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  tslib@2.8.1:
-    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
-
   tsscmp@1.0.6:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
     engines: {node: '>=0.6.x'}
@@ -1881,9 +1870,6 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-
-  zod@4.1.12:
-    resolution: {integrity: sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ==}
 
 snapshots:
 
@@ -3230,12 +3216,6 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mcp-oauth-provider-adapters@git+https://git@github.com:heroku/oauth-provider-adapters-for-mcp.git#1987b5563d39d33e555467f8b5f2edaa6ab7deff:
-    dependencies:
-      openid-client: 6.8.1
-      tslib: 2.8.1
-      zod: 4.1.12
-
   media-typer@1.1.0: {}
 
   merge-descriptors@2.0.0: {}
@@ -3703,8 +3683,6 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  tslib@2.8.1: {}
-
   tsscmp@1.0.6: {}
 
   type-check@0.4.0:
@@ -3813,5 +3791,3 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
-
-  zod@4.1.12: {}
