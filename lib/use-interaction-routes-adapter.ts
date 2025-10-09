@@ -274,4 +274,3 @@ export default (app: Application, provider: Provider): void => {
     }
   );
 };
-

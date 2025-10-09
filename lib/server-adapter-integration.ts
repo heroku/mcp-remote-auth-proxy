@@ -91,4 +91,3 @@ export function validateEnvironmentConfig(env: AdapterEnvironment): boolean {
 
   return true;
 }
-

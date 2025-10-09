@@ -219,4 +219,3 @@ describe('Server Adapter Integration', () => {
     });
   });
 });
-

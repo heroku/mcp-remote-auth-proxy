@@ -390,4 +390,3 @@ export function getIdentityScope(): string {
 export function getOidcAdapter(): OIDCProviderAdapter | null {
   return oidcAdapter;
 }
-

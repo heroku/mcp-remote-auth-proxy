@@ -1,12 +1,12 @@
 /**
  * Tests for use-interaction-routes-adapter.js
- * 
+ *
  * Note: The interaction routes are complex middleware that integrate with
  * oidc-provider and external identity providers. These routes are tested
  * indirectly through comprehensive integration tests in:
  * - server-test.js: Full server initialization and OAuth flow
  * - mcp-server-proxy-test.js: End-to-end authentication and token refresh
- * 
+ *
  * This file tests the error handling middleware which is testable in isolation.
  */
 
@@ -25,7 +25,7 @@ describe('Interaction Routes Adapter', () => {
   beforeEach(() => {
     // Mock Express app
     app = express();
-    
+
     // Mock provider (minimal setup for route registration)
     mockProvider = {
       Client: {
@@ -96,7 +96,7 @@ describe('Interaction Routes Adapter', () => {
       const next = sinon.stub();
 
       const error = new SessionNotFound('Session not found');
-      
+
       // Find the error middleware (has 4 parameters: err, req, res, next)
       const errorMiddleware = app._router.stack.find((layer) => layer.handle?.length === 4);
       errorMiddleware.handle(error, req, res, next);
@@ -120,7 +120,7 @@ describe('Interaction Routes Adapter', () => {
       const next = sinon.stub();
 
       const error = new AccessDenied('Access denied');
-      
+
       const errorMiddleware = app._router.stack.find((layer) => layer.handle?.length === 4);
       errorMiddleware.handle(error, req, res, next);
 
@@ -143,7 +143,7 @@ describe('Interaction Routes Adapter', () => {
       const next = sinon.stub();
 
       const error = new Error('Generic error');
-      
+
       const errorMiddleware = app._router?.stack.find((layer) => layer.handle?.length === 4);
       if (errorMiddleware) {
         errorMiddleware.handle(error, req, res, next);
