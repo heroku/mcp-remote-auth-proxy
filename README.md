@@ -169,16 +169,53 @@ Patching is configured with:
 2. Code diffs in [`patches/`](patches/)
 3. Create or update a patch `npm exec patch-package MODULE_NAME`
 
-## Testing
+## Code Quality and Testing
 
-```
-npm test
+This project uses pnpm for package management and includes comprehensive code quality tools to maintain high standards.
+
+### Available Scripts
+
+```bash
+
+# Run the full Mocha test suite with c8 coverage reporting using the `.env-test` environment configuration
+pnpm test
+
+# Check code quality with ESLint
+pnpm lint
+
+# Automatically fix linting issues and format code with Prettier:
+pnpm format
+
+# Run TypeScript type checking on *.ts files
+pnpm type-check
+
+# All code quality checks and tests
+pnpm check
+
+# Run the continuous integration checks (linting, type checking, and tests):
+pnpm ci
 ```
 
-This script runs `mocha` with the environment loaded from `.env-test`.
+### Development Workflow
+
+For the best development experience:
+
+1. **Before starting work**: Ensure dependencies are installed with `pnpm install`
+2. **During development**: Run `pnpm type-check` periodically to catch type errors early
+3. **Before committing**: Run `pnpm check` to ensure all quality standards are met
+4. **Fix issues quickly**: Use `pnpm format` to auto-fix formatting and linting issues
+
+### Test Environment
+
+Tests require:
+- Redis instance running (local or configured via `MCP_AUTH_PROXY_REDIS_URL` in `.env-test`)
+- Valid test configuration in `.env-test` file
+- All identity provider settings configured for test scenarios
 
 ## Debug
 
+Enable verbose logging for the proxy middleware:
+
 ```
-DEBUG=express-http-proxy npm start
+DEBUG=express-http-proxy pnpm start
 ```
