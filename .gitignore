@@ -3,3 +3,4 @@ node_modules/
 docs/
 .cursor/
 coverage/
+package-lock.json

@@ -3,13 +3,13 @@ import { Buffer } from 'node:buffer';
 import assert from 'assert';
 
 import server from '../lib/server.js';
-import TokenRedisAdapter from "../lib/token-redis-adapter.js";
+import TokenRedisAdapter from '../lib/token-redis-adapter.js';
 
 describe('Server', function () {
   describe('without environment', function () {
     it('should crash', function () {
       assert.throws(() => server(), {
-        message: 'BASE_URL must be a valid URL'
+        message: 'BASE_URL must be a valid URL',
       });
     });
   });
@@ -18,11 +18,11 @@ describe('Server', function () {
     it('should crash with invalid MCP_SERVER_URL', function () {
       const invalidEnv = {
         BASE_URL: 'http://localhost:3001',
-        MCP_SERVER_URL: 'not-a-valid-url'
+        MCP_SERVER_URL: 'not-a-valid-url',
       };
-      
+
       assert.throws(() => server(invalidEnv), {
-        message: 'MCP_SERVER_URL must be a valid URL'
+        message: 'MCP_SERVER_URL must be a valid URL',
       });
     });
 
@@ -30,11 +30,11 @@ describe('Server', function () {
       const invalidEnv = {
         BASE_URL: 'http://localhost:3001',
         MCP_SERVER_URL: 'http://localhost:3000',
-        OIDC_PROVIDER_VIEWS_PATH: '/non/existent/path'
+        OIDC_PROVIDER_VIEWS_PATH: '/non/existent/path',
       };
-      
+
       assert.throws(() => server(invalidEnv), {
-        message: 'The configured OIDC_PROVIDER_VIEWS_PATH does not exist, /non/existent/path'
+        message: 'The configured OIDC_PROVIDER_VIEWS_PATH does not exist, /non/existent/path',
       });
     });
   });
@@ -61,45 +61,62 @@ describe('Server', function () {
       } else {
         done();
       }
-    };
+    }
 
     describe('verifies the release', function () {
       const verifyEnv = {
         ...env,
-        MCP_AUTH_PROXY_VERIFY_RELEASE: 'true'
+        MCP_AUTH_PROXY_VERIFY_RELEASE: 'true',
       };
 
       afterEach(resetServer);
-      
+
       it('server launches and then exits success', function (done) {
-        assert.doesNotThrow(() => {
-          server(verifyEnv, (a, b) => {
-            authProxyServer = a;
-            mcpServerProc = b;
-            done();
-          }, (code) => {
-            if (code !== 0) {
-              assert(false, `Server exited code=${code} before tests completed. Check for errors logged above.`);
-            }
-          });
-        }, {
-          message: 'MCP_AUTH_PROXY_VERIFY_RELEASE should make server exit successfully'
-        });
+        assert.doesNotThrow(
+          () => {
+            server(
+              verifyEnv,
+              (a, b) => {
+                authProxyServer = a;
+                mcpServerProc = b;
+                done();
+              },
+              (code) => {
+                if (code !== 0) {
+                  assert(
+                    false,
+                    `Server exited code=${code} before tests completed. Check for errors logged above.`
+                  );
+                }
+              }
+            );
+          },
+          {
+            message: 'MCP_AUTH_PROXY_VERIFY_RELEASE should make server exit successfully',
+          }
+        );
       });
     });
 
     describe('launches the server', function () {
-      beforeEach(function(done) {
+      beforeEach(function (done) {
         try {
-          server(env, (a, b) => {
-            authProxyServer = a;
-            mcpServerProc = b;
-            done();
-          }, (code) => {
-            if (code !== 0) {
-              assert(false, `Server exited code=${code} before tests completed. Check for errors logged above.`);
+          server(
+            env,
+            (a, b) => {
+              authProxyServer = a;
+              mcpServerProc = b;
+              done();
+            },
+            (code) => {
+              if (code !== 0) {
+                assert(
+                  false,
+                  `Server exited code=${code} before tests completed. Check for errors logged above.`
+                );
+              }
             }
-          });
+          );
         } catch (err) {
           done(err);
         }
@@ -124,29 +141,26 @@ describe('Server', function () {
             hostname: authProxyUrl.hostname,
             port: authProxyUrl.port,
             path: '/.well-known/oauth-authorization-server',
-            method: 'GET'
+            method: 'GET',
           };
-          const req = http.request(
-            options,
-            (res) => {
-              assert.equal(res.statusCode, 200);
-              let resBody = '';
+          const req = http.request(options, (res) => {
+            assert.equal(res.statusCode, 200);
+            let resBody = '';
 
-              res.on("data", (chunk) => {
-                resBody = resBody + chunk;
-              });
+            res.on('data', (chunk) => {
+              resBody = resBody + chunk;
+            });
 
-              res.on("end", () => {
-                try {
-                  let parsedBody = JSON.parse(resBody);
-                  assert.equal(parsedBody.issuer, env.BASE_URL);
-                  done();
-                } catch (err) {
-                  done(err);
-                }
-              });
-            }
-          );
+            res.on('end', () => {
+              try {
+                let parsedBody = JSON.parse(resBody);
+                assert.equal(parsedBody.issuer, env.BASE_URL);
+                done();
+              } catch (err) {
+                done(err);
+              }
+            });
+          });
           req.on('error', (e) => {
             done(e);
           });
@@ -157,7 +171,7 @@ describe('Server', function () {
       describe('POST /mcp without authorization', function () {
         it('should be rejected by Auth Proxy', function (done) {
           const postData = JSON.stringify({
-            'msg': 'Hello World!',
+            msg: 'Hello World!',
           });
           const options = {
             protocol: authProxyUrl.protocol,
@@ -168,15 +182,12 @@ describe('Server', function () {
             headers: {
               'Content-Type': 'application/json',
               'Content-Length': Buffer.byteLength(postData),
-            }
+            },
           };
-          const req = http.request(
-            options,
-            (res) => {
-              assert.equal(res.statusCode, 401);
-              done();
-            }
-          );
+          const req = http.request(options, (res) => {
+            assert.equal(res.statusCode, 401);
+            done();
+          });
           req.on('error', (e) => {
             done(e);
           });
@@ -192,7 +203,7 @@ describe('Server', function () {
             hostname: authProxyUrl.hostname,
             port: authProxyUrl.port,
             path: '/.well-known/oauth-authorization-server',
-            method: 'GET'
+            method: 'GET',
           };
 
           let responsesReceived = 0;
@@ -217,13 +228,10 @@ describe('Server', function () {
           let firstStatus, secondStatus;
 
           // First request
-          let req1 = http.request(
-            options,
-            (res) => {
-              firstStatus = res.statusCode;
-              checkCompletion(firstStatus, secondStatus);
-            }
-          );
+          let req1 = http.request(options, (res) => {
+            firstStatus = res.statusCode;
+            checkCompletion(firstStatus, secondStatus);
+          });
           req1.on('error', (e) => {
             if (!testCompleted) {
               testCompleted = true;
@@ -233,13 +241,10 @@ describe('Server', function () {
           req1.end();
 
           // Second request (sent immediately to trigger rate limit)
-          let req2 = http.request(
-            options,
-            (res) => {
-              secondStatus = res.statusCode;
-              checkCompletion(firstStatus, secondStatus);
-            }
-          );
+          let req2 = http.request(options, (res) => {
+            secondStatus = res.statusCode;
+            checkCompletion(firstStatus, secondStatus);
+          });
           req2.on('error', (e) => {
             if (!testCompleted) {
               testCompleted = true;

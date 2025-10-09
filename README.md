@@ -82,7 +82,7 @@ Set the internal, local URL for the proxy to reach the MCP Server, and the comma
 ```bash
 heroku config:set \
   MCP_SERVER_URL=http://localhost:3000/mcp \
-  MCP_SERVER_RUN_COMMAND="npm" \
+  MCP_SERVER_RUN_COMMAND="pnpm" \
   MCP_SERVER_RUN_ARGS_JSON='["start"]' \
   MCP_SERVER_RUN_DIR="/app" \
   MCP_SERVER_RUN_ENV_JSON='{"PORT":3000,"BACKEND_API_URL":"https://mcp.example.com"}'
@@ -132,7 +132,7 @@ Install the [Remote MCP Auth Proxy Buildpack](https://github.com/heroku/heroku-b
 * Key-Value Store with Redis is required, which you can set in `MCP_AUTH_PROXY_REDIS_URL`
 
 ```
-npm install
+pnpm install
 
 cp .env-example .env
 echo "OIDC_PROVIDER_JWKS='[$(jwkgen --jwk)]'" >> .env
@@ -143,10 +143,10 @@ Inspect `.env` to fill in missing values:
 * Set the `IDENTITY_SERVER_URL`, `IDENTITY_CLIENT_ID`, `IDENTITY_CLIENT_SECRET`, and `IDENTITY_SCOPE` fields in the upstream/primary identity OAuth provider, like a Heroku OAuth client, or Salesforce External Client App. These fields provide the API access required by the MCP server's tools.
 * The redirect URL for the identity OAuth client must use the path `/interaction/identity/callback`, such as `http://localhost:3001/interaction/identity/callback` for local development.
 
-Start NPM:
+Start via `pnpm`:
 
 ```
-npm start
+pnpm start
 ```
 
 Run MCP Inspector pointed at the proxy:
@@ -167,18 +167,55 @@ Patching is configured with:
 
 1. [`package.json`](package.json) `postinstall` script
 2. Code diffs in [`patches/`](patches/)
-3. Create or update a patch `npm exec patch-package MODULE_NAME`
+3. Create or update a patch `pnpm exec patch-package MODULE_NAME`
 
-## Testing
+## Code Quality and Testing
 
+This project uses pnpm for package management and includes comprehensive code quality tools to maintain high standards.
+
+### Available Scripts
+
+```bash
+
+# Run the full Mocha test suite with c8 coverage reporting using the `.env-test` environment configuration
+pnpm test
+
+# Check code quality with ESLint
+pnpm lint
+
+# Automatically fix linting issues and format code with Prettier
+pnpm format
+
+# Run TypeScript type checking on *.ts files
+pnpm type-check
+
+# All code quality checks and tests
+pnpm check
+
+# Run the continuous integration checks (linting, type checking, and tests)
+pnpm ci
 ```
-npm test
-```
 
-This script runs `mocha` with the environment loaded from `.env-test`.
+### Development Workflow
+
+For the best development experience:
+
+1. **Before starting work**: Ensure dependencies are installed with `pnpm install`
+2. **During development**: Run `pnpm type-check` periodically to catch type errors early
+3. **Before committing**: Run `pnpm check` to ensure all quality standards are met
+4. **Fix issues quickly**: Use `pnpm format` to auto-fix formatting and linting issues
+
+### Test Environment
+
+Tests require:
+- Redis instance running (local or configured via `MCP_AUTH_PROXY_REDIS_URL` in `.env-test`)
+- Valid test configuration in `.env-test` file
+- All identity provider settings configured for test scenarios
 
 ## Debug
 
+Enable verbose logging for the proxy middleware:
+
 ```
-DEBUG=express-http-proxy npm start
+DEBUG=express-http-proxy pnpm start
 ```
