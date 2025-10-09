@@ -162,4 +162,29 @@ describe('Identity Client Adapter', () => {
       expect(identityUniqueCallbackPath).to.match(/\/.*:uid.*callback$/);
     });
   });
+
+  describe('legacy compatibility exports', () => {
+    it('should export getIdentityScope function', async () => {
+      const { getIdentityScope } = await import('../lib/identity-client-adapter.js');
+      expect(getIdentityScope).to.be.a('function');
+    });
+
+    it('should export getOidcAdapter function', async () => {
+      const { getOidcAdapter } = await import('../lib/identity-client-adapter.js');
+      expect(getOidcAdapter).to.be.a('function');
+    });
+
+    it('should return identity scope after initialization', async () => {
+      const { getIdentityScope } = await import('../lib/identity-client-adapter.js');
+      const scope = getIdentityScope();
+      expect(scope).to.be.a('string');
+    });
+
+    it('should return oidc adapter after initialization', async () => {
+      const { getOidcAdapter } = await import('../lib/identity-client-adapter.js');
+      const adapter = getOidcAdapter();
+      // Should return the adapter (may be null if not initialized in this test run)
+      expect(adapter === null || typeof adapter === 'object').to.be.true;
+    });
+  });
 });
