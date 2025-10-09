@@ -183,7 +183,7 @@ pnpm test
 # Check code quality with ESLint
 pnpm lint
 
-# Automatically fix linting issues and format code with Prettier:
+# Automatically fix linting issues and format code with Prettier
 pnpm format
 
 # Run TypeScript type checking on *.ts files
@@ -192,7 +192,7 @@ pnpm type-check
 # All code quality checks and tests
 pnpm check
 
-# Run the continuous integration checks (linting, type checking, and tests):
+# Run the continuous integration checks (linting, type checking, and tests)
 pnpm ci
 ```
 
