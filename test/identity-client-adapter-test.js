@@ -10,7 +10,7 @@ import {
   exchangeIdentityCode,
   refreshIdentityToken,
   identityCallbackPath,
-  identityUniqueCallbackPath
+  identityUniqueCallbackPath,
 } from '../lib/identity-client-adapter.js';
 
 describe('Identity Client Adapter', () => {
@@ -24,19 +24,19 @@ describe('Identity Client Adapter', () => {
       clientId: 'test-client-id',
       metadata: sinon.stub().returns({}),
       identityAuthCodeVerifier: null,
-      identityAuthState: null
+      identityAuthState: null,
     };
 
     mockProvider = {
       Client: {
         find: sinon.stub().resolves(mockClient),
         adapter: {
-          upsert: sinon.stub().resolves()
-        }
+          upsert: sinon.stub().resolves(),
+        },
       },
       Interaction: {
-        find: sinon.stub().resolves({ jti: 'test-interaction' })
-      }
+        find: sinon.stub().resolves({ jti: 'test-interaction' }),
+      },
     };
 
     // Reset any module state
@@ -50,7 +50,7 @@ describe('Identity Client Adapter', () => {
         IDENTITY_CLIENT_SECRET: 'test-client-secret',
         IDENTITY_SERVER_URL: 'https://auth.example.com',
         BASE_URL: 'https://app.example.com',
-        IDENTITY_SCOPE: 'openid profile email'
+        IDENTITY_SCOPE: 'openid profile email',
       };
 
       // This test mainly verifies the function doesn't throw
@@ -73,7 +73,7 @@ describe('Identity Client Adapter', () => {
         // Missing IDENTITY_CLIENT_ID
         IDENTITY_CLIENT_SECRET: 'test-client-secret',
         IDENTITY_SERVER_URL: 'https://auth.example.com',
-        BASE_URL: 'https://app.example.com'
+        BASE_URL: 'https://app.example.com',
       };
 
       try {
@@ -93,7 +93,7 @@ describe('Identity Client Adapter', () => {
         IDENTITY_SERVER_URL: 'https://auth.example.com',
         BASE_URL: 'https://app.example.com',
         IDENTITY_CALLBACK_PATH: '/custom/callback',
-        IDENTITY_UNIQUE_CALLBACK_PATH: '/custom/:uid/callback'
+        IDENTITY_UNIQUE_CALLBACK_PATH: '/custom/:uid/callback',
       };
 
       try {
@@ -110,7 +110,12 @@ describe('Identity Client Adapter', () => {
   describe('generateIdentityAuthUrl', () => {
     it('should throw error if not initialized', async () => {
       try {
-        await generateIdentityAuthUrl('test-uid', mockProvider, mockClient, 'https://app.example.com');
+        await generateIdentityAuthUrl(
+          'test-uid',
+          mockProvider,
+          mockClient,
+          'https://app.example.com'
+        );
         expect.fail('Should have thrown an error');
       } catch (error) {
         expect(error.message).to.include('identityClientInit');
@@ -121,7 +126,12 @@ describe('Identity Client Adapter', () => {
   describe('exchangeIdentityCode', () => {
     it('should throw error if not initialized', async () => {
       try {
-        await exchangeIdentityCode(mockProvider, mockClient, 'test-code', 'https://callback.example.com');
+        await exchangeIdentityCode(
+          mockProvider,
+          mockClient,
+          'test-code',
+          'https://callback.example.com'
+        );
         expect.fail('Should have thrown an error');
       } catch (error) {
         expect(error.message).to.include('identityClientInit');

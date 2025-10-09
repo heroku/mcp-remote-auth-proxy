@@ -38,18 +38,9 @@ describe('Auth Proxy for MCP Server', function () {
     } = providerConfig;
     oidcProvider = new Provider(authProxyUrl.href, testProviderConfig);
 
-    await oidcProvider.Client.adapter.upsert(
-      clientData.client_id,
-      clientData
-    );
-    await oidcProvider.Grant.adapter.upsert(
-      grantData.jti,
-      grantData
-    );
-    await oidcProvider.AccessToken.adapter.upsert(
-      accessTokenData.jti,
-      accessTokenData
-    );
+    await oidcProvider.Client.adapter.upsert(clientData.client_id, clientData);
+    await oidcProvider.Grant.adapter.upsert(grantData.jti, grantData);
+    await oidcProvider.AccessToken.adapter.upsert(accessTokenData.jti, accessTokenData);
     validAccessToken = accessTokenData.jti;
 
     await identityClientInit(env, oidcProvider);
@@ -153,8 +144,7 @@ describe('Auth Proxy for MCP Server', function () {
             done(err);
           }
         });
-      }
-      );
+      });
       req.on('error', (e) => {
         done(e);
       });
@@ -172,7 +162,7 @@ describe('Auth Proxy for MCP Server', function () {
         scope: 'global',
         issuedAt: Math.floor(Date.now() / 1000),
         userData: {
-          signature: 'x'
+          signature: 'x',
         },
       });
 
@@ -208,8 +198,7 @@ describe('Auth Proxy for MCP Server', function () {
             done(err);
           }
         });
-      }
-      );
+      });
       req.on('error', (e) => {
         done(e);
       });
@@ -220,9 +209,7 @@ describe('Auth Proxy for MCP Server', function () {
 
   it('should reset client auth when token refresh fails', function (done) {
     const oidcAdapter = getOidcAdapter();
-    sinonSandbox
-      .stub(oidcAdapter, 'refreshToken')
-      .rejects(new Error('Test token refresh failure'));
+    sinonSandbox.stub(oidcAdapter, 'refreshToken').rejects(new Error('Test token refresh failure'));
 
     const postData = JSON.stringify({
       'test-mode': 'respond-unauthorized',
@@ -288,12 +275,13 @@ describe('Auth Proxy for MCP Server', function () {
 
             // Mock the identity client refresh to fail (simulating expired refresh token)
             const oidcAdapter = getOidcAdapter();
-            sinonSandbox.stub(oidcAdapter, 'refreshToken')
+            sinonSandbox
+              .stub(oidcAdapter, 'refreshToken')
               .rejects(new Error('invalid_grant: refresh token expired'));
 
             // Use the mock server's test mode that returns 401 to trigger refresh attempt
             const expiredPostData = JSON.stringify({
-              'test-mode': 'respond-unauthorized'
+              'test-mode': 'respond-unauthorized',
             });
 
             const expiredOptions = {
@@ -305,112 +293,127 @@ describe('Auth Proxy for MCP Server', function () {
               headers: {
                 'Content-Type': 'application/json',
                 'Content-Length': Buffer.byteLength(expiredPostData),
-                'Authorization': `bearer ${validAccessToken}`
-              }
+                Authorization: `bearer ${validAccessToken}`,
+              },
             };
 
             console.log('Step 3: Making request that will trigger refresh failure...');
 
-            const expiredReq = http.request(
-              expiredOptions,
-              function (expiredRes) {
-                console.log(`Step 4: Expired token request got ${expiredRes.statusCode}`);
+            const expiredReq = http.request(expiredOptions, function (expiredRes) {
+              console.log(`Step 4: Expired token request got ${expiredRes.statusCode}`);
 
-                if (expiredRes.statusCode === 302) {
-                  console.log(`Step 6: Redirected to: ${expiredRes.headers['location']}`);
-                  console.log('✅ This confirms the bug - refresh failed, redirected to session reset');
+              if (expiredRes.statusCode === 302) {
+                console.log(`Step 6: Redirected to: ${expiredRes.headers['location']}`);
+                console.log(
+                  '✅ This confirms the bug - refresh failed, redirected to session reset'
+                );
 
-                  // Follow the redirect to demonstrate the FIXED session reset behavior
-                  const resetUrl = new URL(expiredRes.headers['location'], authProxyUrl.href);
-                  const resetReq = http.request(
-                    {
-                      protocol: authProxyUrl.protocol,
-                      hostname: authProxyUrl.hostname,
-                      port: authProxyUrl.port,
-                      path: resetUrl.pathname,
-                      method: 'GET'
-                    },
-                    function (resetRes) {
-                      console.log(`Step 7: Session reset responded with ${resetRes.statusCode}`);
+                // Follow the redirect to demonstrate the FIXED session reset behavior
+                const resetUrl = new URL(expiredRes.headers['location'], authProxyUrl.href);
+                const resetReq = http.request(
+                  {
+                    protocol: authProxyUrl.protocol,
+                    hostname: authProxyUrl.hostname,
+                    port: authProxyUrl.port,
+                    path: resetUrl.pathname,
+                    method: 'GET',
+                  },
+                  function (resetRes) {
+                    console.log(`Step 7: Session reset responded with ${resetRes.statusCode}`);
 
-                      if (resetRes.statusCode === 302) {
-                        // Follow to the "done" endpoint to see our FIXED behavior
-                        const doneUrl = new URL(resetRes.headers['location'], authProxyUrl.href);
-                        const doneReq = http.request(
-                          {
-                            protocol: authProxyUrl.protocol,
-                            hostname: authProxyUrl.hostname,
-                            port: authProxyUrl.port,
-                            path: doneUrl.pathname,
-                            method: 'GET'
-                          },
-                          function (doneRes) {
-                            console.log(`Step 8: Session reset done responded with ${doneRes.statusCode}`);
+                    if (resetRes.statusCode === 302) {
+                      // Follow to the "done" endpoint to see our FIXED behavior
+                      const doneUrl = new URL(resetRes.headers['location'], authProxyUrl.href);
+                      const doneReq = http.request(
+                        {
+                          protocol: authProxyUrl.protocol,
+                          hostname: authProxyUrl.hostname,
+                          port: authProxyUrl.port,
+                          path: doneUrl.pathname,
+                          method: 'GET',
+                        },
+                        function (doneRes) {
+                          console.log(
+                            `Step 8: Session reset done responded with ${doneRes.statusCode}`
+                          );
 
-                            if (doneRes.statusCode === 401) {
-                              // Check for our enhanced MCP-compliant response
-                              const wwwAuth = doneRes.headers['www-authenticate'];
-                              console.log(`Step 9: WWW-Authenticate header: ${wwwAuth}`);
+                          if (doneRes.statusCode === 401) {
+                            // Check for our enhanced MCP-compliant response
+                            const wwwAuth = doneRes.headers['www-authenticate'];
+                            console.log(`Step 9: WWW-Authenticate header: ${wwwAuth}`);
 
-                              let body = '';
-                              doneRes.on('data', chunk => body += chunk);
-                              doneRes.on('end', () => {
-                                const response = JSON.parse(body);
-                                console.log(`Step 10: Enhanced response: ${JSON.stringify(response, null, 2)}`);
+                            let body = '';
+                            doneRes.on('data', (chunk) => (body += chunk));
+                            doneRes.on('end', () => {
+                              const response = JSON.parse(body);
+                              console.log(
+                                `Step 10: Enhanced response: ${JSON.stringify(response, null, 2)}`
+                              );
 
-                                // Verify our fix provides recovery information
-                                if (wwwAuth && wwwAuth.includes('authorization_uri') &&
-                                      response.error === 'session_expired' &&
-                                      response.error_uri) {
-                                  console.log('\n🎉 OAuth Lifecycle Bug FIXED!');
-                                  console.log('   ✅ Normal auth worked');
-                                  console.log('   🚨 Refresh token expired (simulated)');
-                                  console.log('   🔄 Session destroyed → redirect to reset');
-                                  console.log('   ✅ MCP-compliant recovery information provided!');
-                                  console.log('   ✅ MCP clients can now restart OAuth flow using WWW-Authenticate header');
-                                  console.log('   ✅ Endless loop bug eliminated!\n');
-                                  done();
-                                } else {
-                                  done(new Error(`Expected MCP-compliant recovery response, got: ${JSON.stringify(response)}`));
-                                }
-                              });
-                            } else {
-                              done(new Error(`Expected 401 from session reset done, got ${doneRes.statusCode}`));
-                            }
+                              // Verify our fix provides recovery information
+                              if (
+                                wwwAuth &&
+                                wwwAuth.includes('authorization_uri') &&
+                                response.error === 'session_expired' &&
+                                response.error_uri
+                              ) {
+                                console.log('\n🎉 OAuth Lifecycle Bug FIXED!');
+                                console.log('   ✅ Normal auth worked');
+                                console.log('   🚨 Refresh token expired (simulated)');
+                                console.log('   🔄 Session destroyed → redirect to reset');
+                                console.log('   ✅ MCP-compliant recovery information provided!');
+                                console.log(
+                                  '   ✅ MCP clients can now restart OAuth flow using WWW-Authenticate header'
+                                );
+                                console.log('   ✅ Endless loop bug eliminated!\n');
+                                done();
+                              } else {
+                                done(
+                                  new Error(
+                                    `Expected MCP-compliant recovery response, got: ${JSON.stringify(response)}`
+                                  )
+                                );
+                              }
+                            });
+                          } else {
+                            done(
+                              new Error(
+                                `Expected 401 from session reset done, got ${doneRes.statusCode}`
+                              )
+                            );
                           }
-                        );
-                        doneReq.on('error', done);
-                        doneReq.end();
-                      } else {
-                        done(new Error(`Expected 302 from session reset, got ${resetRes.statusCode}`));
-                      }
+                        }
+                      );
+                      doneReq.on('error', done);
+                      doneReq.end();
+                    } else {
+                      done(
+                        new Error(`Expected 302 from session reset, got ${resetRes.statusCode}`)
+                      );
                     }
-                  );
-                  resetReq.on('error', done);
-                  resetReq.end();
-
-                } else {
-                  console.log('❌ Expected 302 redirect after refresh failure');
-                  let body = '';
-                  expiredRes.on('data', chunk => body += chunk);
-                  expiredRes.on('end', () => {
-                    console.log('Response body:', body);
-                    done(new Error(`Expected 302 redirect, got ${expiredRes.statusCode}`));
-                  });
-                }
+                  }
+                );
+                resetReq.on('error', done);
+                resetReq.end();
+              } else {
+                console.log('❌ Expected 302 redirect after refresh failure');
+                let body = '';
+                expiredRes.on('data', (chunk) => (body += chunk));
+                expiredRes.on('end', () => {
+                  console.log('Response body:', body);
+                  done(new Error(`Expected 302 redirect, got ${expiredRes.statusCode}`));
+                });
               }
-            );
+            });
 
             expiredReq.on('error', done);
             expiredReq.write(expiredPostData);
             expiredReq.end();
-
           } catch (err) {
             done(err);
           }
         });
-      }
-      );
+      });
       req.on('error', (e) => {
         done(e);
       });
