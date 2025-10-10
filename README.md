@@ -193,7 +193,7 @@ pnpm type-check
 pnpm check
 
 # Run the continuous integration checks (linting, type checking, and tests)
-pnpm ci
+pnpm ci-check
 ```
 
 ### Development Workflow
