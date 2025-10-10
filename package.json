@@ -18,7 +18,7 @@
     "pretest": "pnpm run lint && pnpm run type-check",
     "type-check": "tsc --noEmit -p tsconfig.json",
     "check": "pnpm run format && pnpm run type-check && pnpm test",
-    "ci": "pnpm run lint && pnpm run type-check && pnpm test"
+    "ci-check": "pnpm run lint && pnpm run type-check && pnpm test"
   },
   "license": "ISC",
   "dependencies": {
