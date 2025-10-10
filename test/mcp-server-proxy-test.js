@@ -48,7 +48,7 @@ describe('Auth Proxy for MCP Server', function () {
     parentExpressApp = express();
     parentExpressApp.use(express.json());
 
-    useMcpServerProxy(parentExpressApp, oidcProvider, mcpServerUrl);
+    useMcpServerProxy({ app: parentExpressApp, provider: oidcProvider, mcpServerUrl });
 
     // Get provider instance config for session reset (same as main server)
     const providerInstanceConfig = instance(oidcProvider).configuration;
@@ -177,7 +177,12 @@ describe('Auth Proxy for MCP Server', function () {
       // Create new express app with mock refresh function
       const testApp = express();
       testApp.use(express.json());
-      useMcpServerProxy(testApp, oidcProvider, mcpServerUrl, mockRefreshToken);
+      useMcpServerProxy({
+        app: testApp,
+        provider: oidcProvider,
+        mcpServerUrl,
+        refreshTokenFunc: mockRefreshToken,
+      });
 
       // Close existing server and start new one with mocked refresh
       parentServer.close(() => {
@@ -234,7 +239,12 @@ describe('Auth Proxy for MCP Server', function () {
     // Create new express app with mock refresh function that fails
     const testApp = express();
     testApp.use(express.json());
-    useMcpServerProxy(testApp, oidcProvider, mcpServerUrl, mockRefreshTokenFails);
+    useMcpServerProxy({
+      app: testApp,
+      provider: oidcProvider,
+      mcpServerUrl,
+      refreshTokenFunc: mockRefreshTokenFails,
+    });
 
     // Get provider instance config for session reset (same as main server)
     const providerInstanceConfig = instance(oidcProvider).configuration;
@@ -287,7 +297,12 @@ describe('Auth Proxy for MCP Server', function () {
       // Create new express app with controllable mock refresh function
       const testApp = express();
       testApp.use(express.json());
-      useMcpServerProxy(testApp, oidcProvider, mcpServerUrl, controllableRefreshToken);
+      useMcpServerProxy({
+        app: testApp,
+        provider: oidcProvider,
+        mcpServerUrl,
+        refreshTokenFunc: controllableRefreshToken,
+      });
 
       // Get provider instance config for session reset
       const providerInstanceConfig = instance(oidcProvider).configuration;
