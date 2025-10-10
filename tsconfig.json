@@ -14,6 +14,6 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["lib/**/*.js", "test/**/*.js", "index.js", "telemetry.js"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["lib/**/*.js", "index.js", "telemetry.js"],
+  "exclude": ["node_modules", "dist", "test/**"]
 }
