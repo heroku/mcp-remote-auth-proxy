@@ -27,6 +27,8 @@ jobs:
         with:
           version: 10.18.1
           run_install: true
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
