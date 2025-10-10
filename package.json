@@ -18,11 +18,12 @@
     "pretest": "pnpm run lint && pnpm run type-check",
     "type-check": "tsc --noEmit -p tsconfig.json",
     "check": "pnpm run format && pnpm run type-check && pnpm test",
-    "ci-check": "pnpm run lint && pnpm run type-check && pnpm test"
+    "ci": "pnpm run lint && pnpm run type-check && pnpm test"
   },
   "license": "ISC",
   "dependencies": {
     "@dotenvx/dotenvx": "^1.51.0",
+    "@heroku/oauth-provider-adapters-for-mcp": "^0.0.0",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.206.0",
     "@opentelemetry/instrumentation-express": "^0.55.0",
