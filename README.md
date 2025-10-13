@@ -123,9 +123,9 @@ Install the [Remote MCP Auth Proxy Buildpack](https://github.com/heroku/heroku-b
 
 ## Using the OAuth Provider Adapter Library
 
-Remote MCP servers should use the [OAuth Provider Adapter Library](https://github.com/heroku/oauth-provider-adapters-for-mcp) to implement the authorization flow consistently, with robust logging and validation.
+Use the [OAuth Provider Adapter Library](https://github.com/heroku/oauth-provider-adapters-for-mcp) to implement the authorization flow for a remote MCP server. The OAuth Provider Adapter Library ensures your authorization implementation is consistent, and includes robust logging and validation features.
 
-This auth proxy no longer supports static OpenID Provider metadata directly. If OIDC discovery is not possible in your environment, configure static metadata using the adapter library. The adapter supports pointing `IDENTITY_SERVER_METADATA_FILE` to a JSON file that includes fields like `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, and `"jwks_uri"`. Discovery remains the recommended approach.
+We recommend using OIDC discovery. If OIDC discovery isn't possible in your environment, configure static metadata using the adapter library. The adapter supports pointing `IDENTITY_SERVER_METADATA_FILE` to a JSON file that includes fields like `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, and `"jwks_uri"`. This auth proxy no longer supports static OpenID Provider metadata directly.
 
 ### Install in Remote Server
 
@@ -143,14 +143,16 @@ This auth proxy no longer supports static OpenID Provider metadata directly. If 
 
 ### Configure with Environment Variables
 
-The adapter supports discovery or static metadata (static metadata is handled by the adapter library, not by this proxy):
+The adapter supports discovery or static metadata:
 
-- `IDENTITY_CLIENT_ID` → OAuth client ID
-- `IDENTITY_CLIENT_SECRET` → OAuth client secret
-- `IDENTITY_SERVER_URL` → Issuer URL (for OIDC discovery)
-- `IDENTITY_REDIRECT_URI` → Redirect URI registered with your IdP
-- `IDENTITY_SCOPE` → Space/comma separated scopes (for example, `openid profile email offline_access`)
-- `IDENTITY_SERVER_METADATA_FILE` → Absolute path to JSON with static metadata (adapter-only)
+- `IDENTITY_CLIENT_ID`: OAuth client ID
+- `IDENTITY_CLIENT_SECRET`: OAuth client secret
+- `IDENTITY_SERVER_URL`: Issuer URL (for OIDC discovery)
+- `IDENTITY_REDIRECT_URI`: Redirect URI registered with your IdP
+- `IDENTITY_SCOPE`: Space or comma separated scopes (for example, `openid profile email offline_access`)
+- `IDENTITY_SERVER_METADATA_FILE`: Absolute path to JSON with static metadata (adapter-only)
+
+> Note: Static metadata is handled by the adapter library, not by this proxy.
 
 ### Usage with Discovery (Recommended)
 
