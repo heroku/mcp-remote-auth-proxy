@@ -237,7 +237,9 @@ pnpm lint
 # Automatically fix linting issues and format code with Prettier
 pnpm format
 
-# Run TypeScript type checking on *.ts files
+# Run TypeScript type checks on enabled JS files with JSDoc tag annotations
+# Note: Add @ts-check at the top of the file to enable type checking
+# Full instrucitons here: https://www.typescriptlang.org/docs/handbook/intro-to-js-ts.html
 pnpm type-check
 
 # All code quality checks and tests
