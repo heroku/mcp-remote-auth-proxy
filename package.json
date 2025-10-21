@@ -23,7 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "@dotenvx/dotenvx": "^1.51.0",
-    "@heroku/oauth-provider-adapters-for-mcp": "^0.0.0",
+    "@heroku/oauth-provider-adapters-for-mcp": "^1.0.0",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.206.0",
     "@opentelemetry/instrumentation-express": "^0.55.0",
