@@ -113,11 +113,6 @@ heroku config:set \
   IDENTITY_SCOPE=global
 ```
 
-#### Non-OIDC Providers
-
-Optionally, for identity providers that don't support OIDC discovery,
-reference a [ServerMetadata JSON file](https://github.com/panva/openid-client/blob/v6.x/docs/interfaces/ServerMetadata.md) that contains the `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, and `"scopes_supported"` fields.
-
 ### Deployment
 
 Your Heroku app is now ready to deploy. Start a new deployment for the app in your [Heroku Dashboard](https://dashboard.heroku.com/).
@@ -126,6 +121,62 @@ Your Heroku app is now ready to deploy. Start a new deployment for the app in yo
 
 Install the [Remote MCP Auth Proxy Buildpack](https://github.com/heroku/heroku-buildpack-mcp-auth-proxy) to deploy this repository as a buildpack alongside a remote MCP server.
 
+## Using the OAuth Provider Adapter Library
+
+Use the [OAuth Provider Adapter Library](https://github.com/heroku/oauth-provider-adapters-for-mcp) to implement the authorization flow for a remote MCP server. The OAuth Provider Adapter Library ensures your authorization implementation is consistent, and includes robust logging and validation features.
+
+We recommend using OIDC discovery. If OIDC discovery isn't possible in your environment, configure static metadata using the adapter library. The adapter supports pointing `IDENTITY_SERVER_METADATA_FILE` to a JSON file that includes fields like `"issuer"`, `"authorization_endpoint"`, `"token_endpoint"`, and `"jwks_uri"`. This auth proxy no longer supports static OpenID Provider metadata directly.
+
+### Install in Remote Server
+
+- npm:
+
+  ```bash
+  npm install @heroku/oauth-provider-adapters-for-mcp
+  ```
+
+- pnpm:
+
+  ```bash
+  pnpm add @heroku/oauth-provider-adapters-for-mcp
+  ```
+
+### Configure with Environment Variables
+
+The adapter supports discovery or static metadata:
+
+- `IDENTITY_CLIENT_ID`: OAuth client ID
+- `IDENTITY_CLIENT_SECRET`: OAuth client secret
+- `IDENTITY_SERVER_URL`: Issuer URL (for OIDC discovery)
+- `IDENTITY_REDIRECT_URI`: Redirect URI registered with your IdP
+- `IDENTITY_SCOPE`: Space or comma separated scopes (for example, `openid profile email offline_access`)
+- `IDENTITY_SERVER_METADATA_FILE`: Absolute path to JSON with static metadata (adapter-only)
+
+> Note: Static metadata is handled by the adapter library, not by this proxy.
+
+### Usage with Discovery (Recommended)
+
+```ts
+import { fromEnvironmentAsync } from '@heroku/oauth-provider-adapters-for-mcp';
+
+// Provide a durable storageHook in production to store PKCE state between steps
+const oidc = await fromEnvironmentAsync({
+  env: process.env,
+  storageHook,            // for example, Redis or your DB
+});
+
+await oidc.initialize();
+
+// Begin the login flow
+const state = crypto.randomUUID();
+const authUrl = await oidc.generateAuthUrl(state, process.env.IDENTITY_REDIRECT_URI!);
+// Redirect the user to authUrl
+
+// Handle callback
+const tokens = await oidc.exchangeCode(code, codeVerifier, process.env.IDENTITY_REDIRECT_URI!);
+// Optionally refresh later
+// const refreshed = await oidc.refreshToken(tokens.refreshToken!);
+```
 # Development
 
 * Use the [JSON Web Key Generator](https://github.com/rakutentech/jwkgen) to generate [jwks](https://github.com/panva/node-oidc-provider/tree/main/docs#jwks).
