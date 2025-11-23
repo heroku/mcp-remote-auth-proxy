@@ -51,8 +51,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0
       express-rate-limit:
-        specifier: ^8.1.0
-        version: 8.1.0(express@5.1.0)
+        specifier: ^8.2.1
+        version: 8.2.1(express@5.1.0)
       helmet:
         specifier: ^8.1.0
         version: 8.1.0
@@ -79,7 +79,7 @@ importers:
         version: 8.0.1
       rate-limit-redis:
         specifier: ^4.2.3
-        version: 4.2.3(express-rate-limit@8.1.0(express@5.1.0))
+        version: 4.2.3(express-rate-limit@8.2.1(express@5.1.0))
       winston:
         specifier: ^3.18.3
         version: 3.18.3
@@ -978,8 +978,8 @@ packages:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}
     engines: {node: '>=10'}
 
-  express-rate-limit@8.1.0:
-    resolution: {integrity: sha512-4nLnATuKupnmwqiJc27b4dCFmB/T60ExgmtDD7waf4LdrbJ8CPZzZRHYErDYNhoz+ql8fUdYwM/opf90PoPAQA==}
+  express-rate-limit@8.2.1:
+    resolution: {integrity: sha512-PCZEIEIxqwhzw4KF0n7QF4QqruVTcF73O5kFKUnGOyjbCCgizBBiFaYpd/fnBLUMPw/BWw9OsiN7GgrNYr7j6g==}
     engines: {node: '>= 16'}
     peerDependencies:
       express: '>= 4.11'
@@ -2915,7 +2915,7 @@ snapshots:
       signal-exit: 3.0.7
       strip-final-newline: 2.0.0
 
-  express-rate-limit@8.1.0(express@5.1.0):
+  express-rate-limit@8.2.1(express@5.1.0):
     dependencies:
       express: 5.1.0
       ip-address: 10.0.1
@@ -3601,9 +3601,9 @@ snapshots:
 
   range-parser@1.2.1: {}
 
-  rate-limit-redis@4.2.3(express-rate-limit@8.1.0(express@5.1.0)):
+  rate-limit-redis@4.2.3(express-rate-limit@8.2.1(express@5.1.0)):
     dependencies:
-      express-rate-limit: 8.1.0(express@5.1.0)
+      express-rate-limit: 8.2.1(express@5.1.0)
 
   raw-body@3.0.1:
     dependencies:
