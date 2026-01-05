@@ -78,8 +78,8 @@ importers:
         specifier: ^8.0.1
         version: 8.0.1
       rate-limit-redis:
-        specifier: ^4.2.3
-        version: 4.2.3(express-rate-limit@8.2.1(express@5.1.0))
+        specifier: ^4.3.1
+        version: 4.3.1(express-rate-limit@8.2.1(express@5.1.0))
       winston:
         specifier: ^3.18.3
         version: 3.18.3
@@ -1616,8 +1616,8 @@ packages:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
 
-  rate-limit-redis@4.2.3:
-    resolution: {integrity: sha512-33Ai6fGBGSxctJxNZRyxzUrqMxcCcnj+EXMJ876c5UTth/wgyWCO7VjTfCEq9+Timjt5/uSFR+whc9/Et0hk/A==}
+  rate-limit-redis@4.3.1:
+    resolution: {integrity: sha512-+a1zU8+D7L8siDK9jb14refQXz60vq427VuiplgnaLk9B2LnvGe/APLTfhwb4uNIL7eWVknh8GnRp/unCj+lMA==}
     engines: {node: '>= 16'}
     peerDependencies:
       express-rate-limit: '>= 6'
@@ -3594,7 +3594,7 @@ snapshots:
 
   range-parser@1.2.1: {}
 
-  rate-limit-redis@4.2.3(express-rate-limit@8.2.1(express@5.1.0)):
+  rate-limit-redis@4.3.1(express-rate-limit@8.2.1(express@5.1.0)):
     dependencies:
       express-rate-limit: 8.2.1(express@5.1.0)
 
