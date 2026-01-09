@@ -4,6 +4,16 @@
 
 import { expect } from 'chai';
 
+function stringifyThrownValue(error) {
+  if (typeof error?.message === 'string') return error.message;
+  if (typeof error === 'string') return error;
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return String(error);
+  }
+}
+
 /**
  * Assert that an async function throws an error containing the expected message
  * @param {Function} asyncFn - Async function to execute
@@ -12,14 +22,17 @@ import { expect } from 'chai';
  * @returns {Promise<Error>} The caught error for additional assertions
  */
 export async function expectThrowsWithMessage(asyncFn, messageSubstring, failMessage) {
+  const expectedFailMessage =
+    failMessage || `Expected function to throw error containing "${messageSubstring}"`;
+
   try {
     await asyncFn();
-    expect.fail(failMessage || `Expected function to throw error containing "${messageSubstring}"`);
+    expect.fail(expectedFailMessage);
   } catch (error) {
-    if (error.message?.includes('Expected function to throw')) {
-      throw error; // Re-throw expect.fail errors
+    if (error?.name === 'AssertionError' && stringifyThrownValue(error) === expectedFailMessage) {
+      throw error;
     }
-    expect(error.message).to.include(messageSubstring);
+    expect(stringifyThrownValue(error)).to.include(messageSubstring);
     return error;
   }
 }
@@ -31,14 +44,15 @@ export async function expectThrowsWithMessage(asyncFn, messageSubstring, failMes
  * @returns {Promise<Error>} The caught error for additional assertions
  */
 export async function expectThrowsExactMessage(asyncFn, exactMessage) {
+  const expectedFailMessage = `Expected function to throw error: "${exactMessage}"`;
   try {
     await asyncFn();
-    expect.fail(`Expected function to throw error: "${exactMessage}"`);
+    expect.fail(expectedFailMessage);
   } catch (error) {
-    if (error.message?.includes('Expected function to throw')) {
+    if (error?.name === 'AssertionError' && stringifyThrownValue(error) === expectedFailMessage) {
       throw error;
     }
-    expect(error.message).to.equal(exactMessage);
+    expect(stringifyThrownValue(error)).to.equal(exactMessage);
     return error;
   }
 }

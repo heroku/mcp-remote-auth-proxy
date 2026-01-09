@@ -44,6 +44,9 @@ describe('Identity Client Adapter', () => {
       client: mockClient,
       interaction: { jti: 'test-interaction', params: { client_id: 'test-client-id' } },
     });
+  });
+
+  afterEach(() => {
     sinon.restore();
   });
 
@@ -158,7 +161,6 @@ describe('Identity Client Adapter', () => {
 
     afterEach(() => {
       resetPkceStore();
-      sinon.restore();
     });
 
     describe('storePKCEState', () => {
@@ -286,7 +288,10 @@ describe('Identity Client Adapter', () => {
         ctx.mockClient.identityAuthCodeVerifier = 'client-session-verifier';
         ctx.mockClient.identityAuthState = 'stored-state';
 
-        const result = await ctx.storageHook.retrievePKCEState('test-interaction-id', 'different-state');
+        const result = await ctx.storageHook.retrievePKCEState(
+          'test-interaction-id',
+          'different-state'
+        );
 
         expect(result).to.be.null;
       });
@@ -294,7 +299,10 @@ describe('Identity Client Adapter', () => {
       it('should return null when no interaction found and not in fallback', async () => {
         configureNoInteraction(ctx.mockProvider);
 
-        const result = await ctx.storageHook.retrievePKCEState('non-existent-interaction', 'some-state');
+        const result = await ctx.storageHook.retrievePKCEState(
+          'non-existent-interaction',
+          'some-state'
+        );
 
         expect(result).to.be.null;
       });
@@ -322,9 +330,21 @@ describe('Identity Client Adapter', () => {
       it('should clean up expired entries from fallback storage', async () => {
         const now = Date.now();
 
-        pkceStateStore.set('expired-1', { state: 'state-1', codeVerifier: 'verifier-1', expiresAt: now - 1000 });
-        pkceStateStore.set('expired-2', { state: 'state-2', codeVerifier: 'verifier-2', expiresAt: now - 2000 });
-        pkceStateStore.set('valid-1', { state: 'state-3', codeVerifier: 'verifier-3', expiresAt: futureExpiry() });
+        pkceStateStore.set('expired-1', {
+          state: 'state-1',
+          codeVerifier: 'verifier-1',
+          expiresAt: now - 1000,
+        });
+        pkceStateStore.set('expired-2', {
+          state: 'state-2',
+          codeVerifier: 'verifier-2',
+          expiresAt: now - 2000,
+        });
+        pkceStateStore.set('valid-1', {
+          state: 'state-3',
+          codeVerifier: 'verifier-3',
+          expiresAt: futureExpiry(),
+        });
 
         await ctx.storageHook.cleanupExpiredState(now);
 
@@ -345,8 +365,16 @@ describe('Identity Client Adapter', () => {
       it('should clean up all entries when all are expired', async () => {
         const now = Date.now();
 
-        pkceStateStore.set('expired-1', { state: 'state-1', codeVerifier: 'verifier-1', expiresAt: now - 1000 });
-        pkceStateStore.set('expired-2', { state: 'state-2', codeVerifier: 'verifier-2', expiresAt: now - 2000 });
+        pkceStateStore.set('expired-1', {
+          state: 'state-1',
+          codeVerifier: 'verifier-1',
+          expiresAt: now - 1000,
+        });
+        pkceStateStore.set('expired-2', {
+          state: 'state-2',
+          codeVerifier: 'verifier-2',
+          expiresAt: now - 2000,
+        });
 
         await ctx.storageHook.cleanupExpiredState(now);
 
@@ -363,7 +391,12 @@ describe('Identity Client Adapter', () => {
 
       it('storePKCEState should accept (interactionId, state, codeVerifier, expiresAt)', async () => {
         expect(ctx.storageHook.storePKCEState.length).to.equal(4);
-        await ctx.storageHook.storePKCEState('interaction-id', 'state', 'code-verifier', futureExpiry());
+        await ctx.storageHook.storePKCEState(
+          'interaction-id',
+          'state',
+          'code-verifier',
+          futureExpiry()
+        );
       });
 
       it('retrievePKCEState should accept (interactionId, state)', async () => {
