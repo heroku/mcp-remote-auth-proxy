@@ -141,6 +141,23 @@ describe('Identity Client Adapter', () => {
         expect(error.message).to.include('identityClientInit');
       }
     });
+
+    it('should accept optional interactionId parameter for fallback storage lookup', async () => {
+      // This tests the function signature - actual functionality requires initialization
+      try {
+        await exchangeIdentityCode(
+          mockProvider,
+          mockClient,
+          'test-code',
+          'https://callback.example.com',
+          'test-interaction-id' // Optional 5th parameter
+        );
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        // Should fail due to not being initialized, not due to wrong signature
+        expect(error.message).to.include('identityClientInit');
+      }
+    });
   });
 
   describe('refreshIdentityToken', () => {
