@@ -123,7 +123,15 @@ export function expectFallbackStoreEntry({
 export function expectClientSessionStorage({ mockClient, state, codeVerifier, adapterUpsertStub }) {
   expect(mockClient.identityAuthCodeVerifier).to.equal(codeVerifier);
   expect(mockClient.identityAuthState).to.equal(state);
+  expect(mockClient.metadata.calledOnce).to.be.true;
+
   expect(adapterUpsertStub.calledOnce).to.be.true;
+  expect(
+    adapterUpsertStub.calledWith(
+      mockClient.clientId,
+      sinon.match.has('clientId', mockClient.clientId)
+    )
+  ).to.be.true;
   expect(pkceStateStore.size).to.equal(0, 'Fallback store should be empty');
 }
 
