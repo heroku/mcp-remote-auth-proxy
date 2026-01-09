@@ -16,7 +16,7 @@ importers:
         version: 1.51.1
       '@heroku/oauth-provider-adapters-for-mcp':
         specifier: github:heroku/oauth-provider-adapters-for-mcp#fix/make-jwks-uri-optional
-        version: https://codeload.github.com/heroku/oauth-provider-adapters-for-mcp/tar.gz/30f7d10d7bea382b31072afc95a933084a2a2704
+        version: https://codeload.github.com/heroku/oauth-provider-adapters-for-mcp/tar.gz/968280a329ebbc41d9f94e666e9e80f7504a94ae
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
@@ -185,8 +185,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@heroku/oauth-provider-adapters-for-mcp@https://codeload.github.com/heroku/oauth-provider-adapters-for-mcp/tar.gz/30f7d10d7bea382b31072afc95a933084a2a2704':
-    resolution: {tarball: https://codeload.github.com/heroku/oauth-provider-adapters-for-mcp/tar.gz/30f7d10d7bea382b31072afc95a933084a2a2704}
+  '@heroku/oauth-provider-adapters-for-mcp@https://codeload.github.com/heroku/oauth-provider-adapters-for-mcp/tar.gz/968280a329ebbc41d9f94e666e9e80f7504a94ae':
+    resolution: {tarball: https://codeload.github.com/heroku/oauth-provider-adapters-for-mcp/tar.gz/968280a329ebbc41d9f94e666e9e80f7504a94ae}
     version: 1.0.0
     engines: {node: '>=20.0.0'}
 
@@ -2009,7 +2009,7 @@ snapshots:
       protobufjs: 7.5.4
       yargs: 17.7.2
 
-  '@heroku/oauth-provider-adapters-for-mcp@https://codeload.github.com/heroku/oauth-provider-adapters-for-mcp/tar.gz/30f7d10d7bea382b31072afc95a933084a2a2704':
+  '@heroku/oauth-provider-adapters-for-mcp@https://codeload.github.com/heroku/oauth-provider-adapters-for-mcp/tar.gz/968280a329ebbc41d9f94e666e9e80f7504a94ae':
     dependencies:
       http-errors: 2.0.1
       http-status-codes: 2.3.0
