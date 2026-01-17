@@ -481,12 +481,15 @@ describe('Identity Client Adapter', () => {
 
         try {
           // Initialize with mock
-          await originalInit({
-            IDENTITY_CLIENT_ID: 'test-client',
-            IDENTITY_CLIENT_SECRET: 'secret',
-            IDENTITY_SERVER_URL: 'https://auth.example.com',
-            BASE_URL: 'https://app.example.com',
-          }, mockProvider).catch(() => {});
+          await originalInit(
+            {
+              IDENTITY_CLIENT_ID: 'test-client',
+              IDENTITY_CLIENT_SECRET: 'secret',
+              IDENTITY_SERVER_URL: 'https://auth.example.com',
+              BASE_URL: 'https://app.example.com',
+            },
+            mockProvider
+          ).catch(() => {});
 
           // Since we can't easily inject the adapter, this test verifies the error path
           // The actual implementation would need the adapter to be properly initialized

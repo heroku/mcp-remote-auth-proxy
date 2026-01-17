@@ -1,6 +1,4 @@
 import js from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsparser from '@typescript-eslint/parser';
 
 export default [
   js.configs.recommended,
@@ -9,7 +7,6 @@ export default [
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
-      parser: tsparser,
       parserOptions: {
         ecmaFeatures: {
           jsx: false,
@@ -27,9 +24,6 @@ export default [
         setInterval: 'readonly',
         clearInterval: 'readonly',
       },
-    },
-    plugins: {
-      '@typescript-eslint': tseslint,
     },
     rules: {
       'no-unused-vars': [
