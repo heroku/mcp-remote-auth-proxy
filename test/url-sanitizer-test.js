@@ -14,7 +14,10 @@ describe('URL Sanitizer', function () {
       it('should preserve non-sensitive query parameters', function () {
         const url = 'https://example.com/auth?scope=openid&response_type=code&nonce=test123';
         const result = sanitizeUrl(url);
-        assert.strictEqual(result, 'https://example.com/auth?scope=openid&response_type=code&nonce=test123');
+        assert.strictEqual(
+          result,
+          'https://example.com/auth?scope=openid&response_type=code&nonce=test123'
+        );
       });
 
       it('should remove sensitive parameters while preserving non-sensitive ones', function () {
@@ -183,4 +186,3 @@ describe('URL Sanitizer', function () {
     });
   });
 });
-
