@@ -168,6 +168,45 @@ describe('Server', function () {
         });
       });
 
+      describe('GET /.well-known/oauth-protected-resource', function () {
+        it('should respond with JSON metadata', function (done) {
+          const options = {
+            protocol: authProxyUrl.protocol,
+            hostname: authProxyUrl.hostname,
+            port: authProxyUrl.port,
+            path: '/.well-known/oauth-protected-resource',
+            method: 'GET',
+          };
+          const req = http.request(options, (res) => {
+            assert.equal(res.statusCode, 200);
+            let resBody = '';
+
+            res.on('data', (chunk) => {
+              resBody = resBody + chunk;
+            });
+
+            res.on('end', () => {
+              try {
+                let parsedBody = JSON.parse(resBody);
+                assert.equal(parsedBody.resource, env.BASE_URL);
+                assert(Array.isArray(parsedBody.authorization_servers));
+                assert.equal(parsedBody.authorization_servers[0], env.BASE_URL);
+                assert(Array.isArray(parsedBody.bearer_methods_supported));
+                assert(parsedBody.bearer_methods_supported.includes('header'));
+                assert(Array.isArray(parsedBody.scopes_supported));
+                done();
+              } catch (err) {
+                done(err);
+              }
+            });
+          });
+          req.on('error', (e) => {
+            done(e);
+          });
+          req.end();
+        });
+      });
+
       describe('POST /mcp without authorization', function () {
         it('should be rejected by Auth Proxy', function (done) {
           const postData = JSON.stringify({
