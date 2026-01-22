@@ -188,7 +188,7 @@ describe('Server', function () {
             res.on('end', () => {
               try {
                 let parsedBody = JSON.parse(resBody);
-                assert.equal(parsedBody.resource, env.BASE_URL);
+                assert.equal(parsedBody.resource, env.BASE_URL + '/mcp');
                 assert(Array.isArray(parsedBody.authorization_servers));
                 assert.equal(parsedBody.authorization_servers[0], env.BASE_URL);
                 assert(Array.isArray(parsedBody.bearer_methods_supported));
