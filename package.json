@@ -30,7 +30,7 @@
     "@opentelemetry/instrumentation-net": "^0.52.0",
     "@opentelemetry/instrumentation-undici": "^0.17.0",
     "@opentelemetry/sdk-node": "^0.209.0",
-    "@opentelemetry/sdk-trace-node": "^2.2.0",
+    "@opentelemetry/sdk-trace-node": "^2.5.0",
     "desm": "^1.3.1",
     "ejs": "^3.1.10",
     "express": "^5.2.1",
