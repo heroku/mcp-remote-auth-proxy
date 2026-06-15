@@ -17,9 +17,24 @@ describe('interaction-policy', function () {
     assert.equal(confirmLoginPrompt.requestable, true, 'should be requestable');
   });
 
-  it('should not have consent prompt (removed)', function () {
+  it('should keep consent prompt registered with a no-op check', function () {
     const consentPrompt = policy.get('consent');
-    assert.equal(consentPrompt, undefined, 'consent prompt should be removed');
+    assert(consentPrompt, 'consent prompt should remain registered');
+    assert.equal(
+      consentPrompt.requestable,
+      true,
+      'consent must be requestable so prompt=consent is accepted by oidc-provider'
+    );
+
+    const upstreamCheck = consentPrompt.checks.find(
+      (c) => c.reason === 'consent_granted_upstream'
+    );
+    assert(upstreamCheck, 'should have consent_granted_upstream check');
+    assert.equal(
+      upstreamCheck.check({}),
+      interactionPolicy.Check.NO_NEED_TO_PROMPT,
+      'consent_granted_upstream should never request a consent prompt'
+    );
   });
 
   describe('is_login_confirmed check', function () {
