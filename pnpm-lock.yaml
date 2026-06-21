@@ -17,8 +17,8 @@ importers:
         specifier: ^1.51.1
         version: 1.51.1
       '@heroku/oauth-provider-adapters-for-mcp':
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.0.4
+        version: 1.0.4
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
@@ -68,8 +68,8 @@ importers:
         specifier: ^1.10.1
         version: 1.10.1
       nanoid:
-        specifier: ^5.1.11
-        version: 5.1.11
+        specifier: ^5.1.15
+        version: 5.1.15
       oidc-provider:
         specifier: ^9.6.1
         version: 9.6.1
@@ -177,8 +177,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@heroku/oauth-provider-adapters-for-mcp@1.0.3':
-    resolution: {integrity: sha512-q6/+LfERFc4sCaPSpmt5PDJrOpCO0UHH8Owb+pkW1PW0hEXHepdYRLMNE5V0+i2G/Zy4b+EqkNbKcNilWidlVg==}
+  '@heroku/oauth-provider-adapters-for-mcp@1.0.4':
+    resolution: {integrity: sha512-UoZYOLuKoZtUzUsKDTX3S6WMHzhzL6IJrZ6icAX0mSU8tGbYEKwfiqMqIBKLBq1Vu6aA5NsdUXEfNl/jXwOG4w==}
     engines: {node: '>=20.0.0'}
 
   '@humanfs/core@0.19.2':
@@ -1379,8 +1379,8 @@ packages:
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
-  nanoid@5.1.11:
-    resolution: {integrity: sha512-v+KEsUv2ps74PaSKv0gHTxTCgMXOIfBEbaqa6w6ISIGC7ZsvHN4N9oJ8d4cmf0n5oTzQz2SLmThbQWhjd/8eKg==}
+  nanoid@5.1.15:
+    resolution: {integrity: sha512-kBg3RpGtIe+RpTbyXwoI6pk5yD7KUiI3sygUqgeBMRst42KmhB4RZC7eiO9Wa1HIpaCCtpE2DJ6OI4Wi5ebwFw==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -1916,7 +1916,7 @@ snapshots:
       protobufjs: 7.6.4
       yargs: 17.7.2
 
-  '@heroku/oauth-provider-adapters-for-mcp@1.0.3':
+  '@heroku/oauth-provider-adapters-for-mcp@1.0.4':
     dependencies:
       http-errors: 2.0.1
       http-status-codes: 2.3.0
@@ -3219,7 +3219,7 @@ snapshots:
 
   ms@2.1.3: {}
 
-  nanoid@5.1.11: {}
+  nanoid@5.1.15: {}
 
   natural-compare@1.4.0: {}
 
@@ -3248,7 +3248,7 @@ snapshots:
       jose: 6.1.3
       jsesc: 3.1.0
       koa: 3.1.2
-      nanoid: 5.1.11
+      nanoid: 5.1.15
       quick-lru: 7.3.0
       raw-body: 3.0.2
     transitivePeerDependencies:
