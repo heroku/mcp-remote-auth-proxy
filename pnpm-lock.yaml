@@ -17,8 +17,8 @@ importers:
         specifier: ^1.51.1
         version: 1.51.1
       '@heroku/oauth-provider-adapters-for-mcp':
-        specifier: ^1.0.3
-        version: 1.0.3
+        specifier: ^1.0.4
+        version: 1.0.4
       '@opentelemetry/api':
         specifier: ^1.9.1
         version: 1.9.1
@@ -177,8 +177,8 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@heroku/oauth-provider-adapters-for-mcp@1.0.3':
-    resolution: {integrity: sha512-q6/+LfERFc4sCaPSpmt5PDJrOpCO0UHH8Owb+pkW1PW0hEXHepdYRLMNE5V0+i2G/Zy4b+EqkNbKcNilWidlVg==}
+  '@heroku/oauth-provider-adapters-for-mcp@1.0.4':
+    resolution: {integrity: sha512-UoZYOLuKoZtUzUsKDTX3S6WMHzhzL6IJrZ6icAX0mSU8tGbYEKwfiqMqIBKLBq1Vu6aA5NsdUXEfNl/jXwOG4w==}
     engines: {node: '>=20.0.0'}
 
   '@humanfs/core@0.19.2':
@@ -1916,7 +1916,7 @@ snapshots:
       protobufjs: 7.6.4
       yargs: 17.7.2
 
-  '@heroku/oauth-provider-adapters-for-mcp@1.0.3':
+  '@heroku/oauth-provider-adapters-for-mcp@1.0.4':
     dependencies:
       http-errors: 2.0.1
       http-status-codes: 2.3.0
