@@ -65,8 +65,8 @@ importers:
         specifier: ^4.18.1
         version: 4.18.1
       morgan:
-        specifier: ^1.10.1
-        version: 1.10.1
+        specifier: ^1.12.0
+        version: 1.12.0
       nanoid:
         specifier: ^5.1.16
         version: 5.1.16
@@ -1369,8 +1369,8 @@ packages:
   module-details-from-path@1.0.4:
     resolution: {integrity: sha512-EGWKgxALGMgzvxYF1UyGTy0HXX/2vHLkw6+NvDKW2jypWbHpjQuj4UMcqQWXHERJhVGKikolT06G3bcKe4fi7w==}
 
-  morgan@1.10.1:
-    resolution: {integrity: sha512-223dMRJtI/l25dJKWpgij2cMtywuG/WiUKXdvwfbhGKBhy1puASqXwFzmWZ7+K73vUPoR7SS2Qz2cI/g9MKw0A==}
+  morgan@1.12.0:
+    resolution: {integrity: sha512-OHpTRQwn2ezasILW8iKe+Yww1XsfWsZIpUOLF7RDb2g5GwO3trPaRwi7+8BDiJ7HFx2Kg2mfUdCBcVhwYlOz2g==}
     engines: {node: '>= 0.8.0'}
 
   ms@2.0.0:
@@ -1416,10 +1416,6 @@ packages:
 
   oidc-provider@9.6.1:
     resolution: {integrity: sha512-8AtFXE4gEV6MLd8Re78VhqGNjBm/SUw0fUxrP2XwQc+5DZKw6GyuTuy2M4jkidpH3jRrhtkkqQpXlxD1Awi6tg==}
-
-  on-finished@2.3.0:
-    resolution: {integrity: sha512-ikqdkGAAyf/X/gPhXGvfgAytDZtDbr+bkNUJ0N9h5MI/dmdgCs3l6hoHrcUv41sRKew3jIwrp4qQDXiK99Utww==}
-    engines: {node: '>= 0.8'}
 
   on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
@@ -3205,12 +3201,12 @@ snapshots:
 
   module-details-from-path@1.0.4: {}
 
-  morgan@1.10.1:
+  morgan@1.12.0:
     dependencies:
       basic-auth: 2.0.1
       debug: 2.6.9
       depd: 2.0.0
-      on-finished: 2.3.0
+      on-finished: 2.4.1
       on-headers: 1.1.0
     transitivePeerDependencies:
       - supports-color
@@ -3253,10 +3249,6 @@ snapshots:
       raw-body: 3.0.2
     transitivePeerDependencies:
       - supports-color
-
-  on-finished@2.3.0:
-    dependencies:
-      ee-first: 1.1.1
 
   on-finished@2.4.1:
     dependencies:
